@@ -103,15 +103,46 @@ export default function DaySummaryPage() {
               </div>
             </div>
 
-            <p className="mt-4 text-center text-sm text-neutral-text">
-              分享圖片卡與多日總結報告將於後續版本提供
-              <br />
-              Share card & multi-day report coming soon
-            </p>
+            <div className="mt-4 rounded-2xl bg-white p-4">
+              <p className="info-primary text-center font-bold">
+                旅程還要繼續嗎？ Continue tomorrow?
+              </p>
+              <p className="info-secondary mt-1 text-center text-neutral-text">
+                明天在地圖按「開始今天的旅途」可以繼續這趟旅程
+              </p>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (
+                    !window.confirm(
+                      '結束整趟旅程？結束後分享連結將於 24 小時後失效。\nEnd the whole trip?'
+                    )
+                  )
+                    return;
+                  const res = await fetch('/api/trips/complete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      deviceId: getDeviceId(),
+                      tripId: params.tripId,
+                    }),
+                  });
+                  if (res.ok) {
+                    localStorage.removeItem('formosa_last_trip');
+                    window.location.href = `/journey/summary/${params.tripId}`;
+                  } else {
+                    window.alert('結束失敗，請稍後再試');
+                  }
+                }}
+                className="tap-target mt-3 w-full rounded-xl bg-navy py-3 font-bold text-white"
+              >
+                🏆 結束整趟旅程，看總結報告
+              </button>
+            </div>
 
             <Link
               href="/"
-              className="tap-target mt-4 flex items-center justify-center rounded-xl bg-primary py-3 font-bold text-white"
+              className="tap-target mt-3 flex items-center justify-center rounded-xl bg-primary py-3 font-bold text-white"
             >
               🗺️ 回到地圖 Back to map
             </Link>

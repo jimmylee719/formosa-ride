@@ -146,7 +146,17 @@ export function JourneyHUD() {
     trailRef.current = [];
     prevKmRef.current = 0;
     prevCountyRef.current = null;
-    await journeyTracker.start();
+    // 多日銜接（Phase 11C）：昨天結束過一天的旅程，可續接同一趟
+    let resumeTripId: string | undefined;
+    const lastTrip = localStorage.getItem('formosa_last_trip');
+    if (lastTrip) {
+      const cont = window.confirm(
+        '要繼續上次的旅程嗎？\n「確定」= 繼續同一趟旅程（第 N+1 天）\n「取消」= 開始全新的旅程'
+      );
+      if (cont) resumeTripId = lastTrip;
+      else localStorage.removeItem('formosa_last_trip');
+    }
+    await journeyTracker.start(resumeTripId);
     setStats(journeyTracker.getStats());
     setBusy(false);
   };

@@ -162,12 +162,13 @@ class JourneyTracker {
     if (s) this.listeners.forEach((fn) => fn(s));
   }
 
-  async start(): Promise<string> {
+  /** 開始旅途；傳入 resumeTripId 可續接多日旅程（同一 tripId，日摘要遞增） */
+  async start(resumeTripId?: string): Promise<string> {
     await this.init();
     if (this.trip && this.trip.status === 'active') return this.trip.tripId;
     if (!this.trip) {
       this.trip = {
-        tripId: crypto.randomUUID(),
+        tripId: resumeTripId ?? crypto.randomUUID(),
         startedAt: new Date().toISOString(),
         status: 'active',
         totalDistanceKm: 0,
@@ -392,6 +393,12 @@ class JourneyTracker {
       }
     } catch {
       ok = false;
+    }
+    // 記住這趟旅程，明天可續接（Phase 11C 多日銜接）
+    try {
+      localStorage.setItem('formosa_last_trip', trip.tripId);
+    } catch {
+      /* storage 不可用時忽略 */
     }
     await this.teardownLocal();
     return { tripId: trip.tripId, ok, dayNumber };
