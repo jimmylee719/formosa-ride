@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import { Header } from '@/components/ui/Header';
 import { BottomNavBar } from '@/components/mobile/BottomNavBar';
 import { RouteDetailMap } from '@/components/route/RouteDetailMap';
+import { ElevationProfile } from '@/components/route/ElevationProfile';
 import { getRoute } from '@/lib/route-queries';
 import { createAnonServerClient } from '@/lib/supabase-server';
 import { DIFFICULTY_LABELS, ROUTE_TYPE_LABELS } from '@/types/route';
@@ -112,6 +113,14 @@ export default async function RouteDetailPage({
         <div className="mt-3">
           <RouteDetailMap geometry={route.geometry} />
         </div>
+
+        {/* 海拔剖面（Phase 6） */}
+        <section className="mt-3 rounded-xl bg-white p-4">
+          <h2 className="info-primary font-bold">⛰️ 海拔剖面 · Elevation</h2>
+          <div className="mt-2">
+            <ElevationProfile routeId={route.id} />
+          </div>
+        </section>
         <Link
           href={`/?route=${route.id}`}
           className="tap-target mt-3 flex items-center justify-center rounded-xl bg-primary py-3 font-bold text-white"
