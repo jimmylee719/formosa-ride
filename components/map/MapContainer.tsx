@@ -13,6 +13,8 @@ export function MapContainer() {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const { center, zoom, setView, setMap } = useMapStore();
+  const isNightMode = useMapStore((s) => s.isNightMode);
+  const nightApplied = useRef(false);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -68,6 +70,14 @@ export function MapContainer() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 只初始化一次；center/zoom 後續由地圖本身驅動 store
+
+  // 夜間模式：切換深色底圖（v3.0 C1；圖層元件監聽 style.load 自行重繪）
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || nightApplied.current === isNightMode) return;
+    nightApplied.current = isNightMode;
+    map.setStyle(getMapStyleUrl(isNightMode ? 'dark' : 'outdoor'));
+  }, [isNightMode]);
 
   return (
     <div className="relative h-full w-full">

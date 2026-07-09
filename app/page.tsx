@@ -9,6 +9,9 @@ import { POICard } from '@/components/poi/POICard';
 import { MapFAB } from '@/components/mobile/MapFAB';
 import { FilterModal } from '@/components/mobile/FilterModal';
 import { RouteLayer } from '@/components/map/RouteLayer';
+import { NightModeController } from '@/components/map/NightModeController';
+import { NightWarningLayer } from '@/components/map/NightWarningLayer';
+import { NightSafetyBanner } from '@/components/mobile/NightSafetyBanner';
 
 export default function HomePage() {
   return (
@@ -20,8 +23,11 @@ export default function HomePage() {
         {/* useSearchParams 需要 Suspense 邊界（Next 15） */}
         <Suspense fallback={null}>
           <RouteLayer />
+          <NightModeController />
         </Suspense>
+        <NightWarningLayer />
         <MapFAB />
+        <NightSafetyBanner />
         <POICard />
       </main>
       <BottomNavBar />

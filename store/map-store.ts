@@ -24,6 +24,8 @@ interface MapState {
   toggleType: (type: POIType) => void;
   /** 大分類一鍵切換：該組全選 ↔ 全取消（v10.0「多數時候只需點 1 次」） */
   toggleGroup: (types: POIType[]) => void;
+  /** 直接設定篩選（夜間橫幅快捷鈕等情境用） */
+  setActiveTypes: (types: POIType[]) => void;
   clearFilters: () => void;
   setFilterOpen: (open: boolean) => void;
 }
@@ -55,6 +57,7 @@ export const useMapStore = create<MapState>((set) => ({
           : [...new Set([...s.activeTypes, ...types])],
       };
     }),
+  setActiveTypes: (types) => set({ activeTypes: types }),
   clearFilters: () => set({ activeTypes: [] }),
   setFilterOpen: (open) => set({ isFilterOpen: open }),
 }));

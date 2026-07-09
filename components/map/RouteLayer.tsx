@@ -17,6 +17,7 @@ export function RouteLayer() {
   useEffect(() => {
     if (!map || !routeId) return;
     let disposed = false;
+    let readd: (() => void) | null = null;
 
     const draw = async () => {
       try {
@@ -54,6 +55,9 @@ export function RouteLayer() {
         // 'idle' 在樣式就緒後必定觸發，不像 'load' 可能在註冊前就已發生（競態）
         if (map.isStyleLoaded()) add();
         else map.once('idle', add);
+        // 夜間模式 setStyle 會清空自訂圖層，監聽 style.load 重繪（Phase 7B）
+        readd = add;
+        map.on('style.load', add);
       } catch (err) {
         console.error('[RouteLayer] 載入路線失敗:', err);
       }
@@ -63,6 +67,7 @@ export function RouteLayer() {
 
     return () => {
       disposed = true;
+      if (readd) map.off('style.load', readd);
       if (map.getLayer(LAYER_ID)) map.removeLayer(LAYER_ID);
       if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
     };
