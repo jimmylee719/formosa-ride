@@ -15,6 +15,7 @@ import { getAheadPOIs } from '@/lib/ahead-pois';
 import { crossedMilestone, countyChangeMessage } from '@/lib/milestones';
 import { nearestCounty } from '@/lib/taiwan-counties';
 import { POI_ICONS } from '@/lib/poi-icons';
+import { ShareModal } from '@/components/mobile/ShareModal';
 import type { POIRecord } from '@/types/poi';
 
 const TRAIL_SOURCE = 'journey-trail';
@@ -28,6 +29,7 @@ export function JourneyHUD() {
   const [aheadPois, setAheadPois] = useState<POIRecord[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const trailRef = useRef<[number, number][]>([]);
   const drawTrailRef = useRef<(() => void) | null>(null);
   const prevKmRef = useRef(0);
@@ -279,11 +281,19 @@ export function JourneyHUD() {
             <div className="mt-3 flex gap-2">
               <button
                 type="button"
+                onClick={() => setShareOpen(true)}
+                disabled={busy}
+                className="tap-target flex-1 rounded-xl border border-neutral-border py-3 font-bold disabled:opacity-50"
+              >
+                📍 分享位置
+              </button>
+              <button
+                type="button"
                 onClick={handleMarkPoint}
                 disabled={busy}
                 className="tap-target flex-1 rounded-xl border border-neutral-border py-3 font-bold disabled:opacity-50"
               >
-                📌 標記此地點
+                📌 標記
               </button>
               <button
                 type="button"
@@ -294,6 +304,9 @@ export function JourneyHUD() {
                 🏁 結束今天
               </button>
             </div>
+            {shareOpen && (
+              <ShareModal tripId={stats.tripId} onClose={() => setShareOpen(false)} />
+            )}
           </div>
         )}
       </div>

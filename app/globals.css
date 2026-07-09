@@ -43,6 +43,16 @@ button {
     @apply min-h-tap min-w-tap;
   }
 
+  /* 追蹤頁的即時位置點（Phase 11A）：藍點 + 白框 + 呼吸圈 */
+  .track-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    background: #3b82f6;
+    border: 3px solid white;
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.25);
+  }
+
   /* POI 地圖圖示（DOM Marker，Phase 4）：視覺 36px + 透明外距湊足 44px 點擊區 */
   .poi-marker {
     @apply flex items-center justify-center rounded-full border-2 border-white bg-white shadow-md;
