@@ -1,6 +1,7 @@
 // /profile — 「我的」頁籤（會員功能於 Phase 9 實作）
 // Phase 8C：次要提醒完整清單放置於此（v10.0 B4）
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { Header } from '@/components/ui/Header';
 import { BottomNavBar } from '@/components/mobile/BottomNavBar';
 import { ActiveAlertsList } from '@/components/mobile/ActiveAlertsList';
@@ -13,7 +14,14 @@ export default function ProfilePage() {
         <Suspense fallback={null}>
           <ActiveAlertsList />
         </Suspense>
-        <div className="flex flex-col items-center gap-2 rounded-2xl bg-white p-8 text-center">
+        <Link
+          href="/feedback"
+          className="tap-target flex w-full items-center justify-between rounded-2xl bg-white p-4"
+        >
+          <span className="info-primary font-bold">💬 回饋意見 Feedback</span>
+          <span aria-hidden>›</span>
+        </Link>
+        <div className="flex w-full flex-col items-center gap-2 rounded-2xl bg-white p-8 text-center">
           <p className="text-4xl" aria-hidden>
             🚧
           </p>
