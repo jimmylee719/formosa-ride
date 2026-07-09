@@ -11,7 +11,7 @@ import { FilterModal } from '@/components/mobile/FilterModal';
 import { RouteLayer } from '@/components/map/RouteLayer';
 import { NightModeController } from '@/components/map/NightModeController';
 import { NightWarningLayer } from '@/components/map/NightWarningLayer';
-import { NightSafetyBanner } from '@/components/mobile/NightSafetyBanner';
+import { BannerQueue } from '@/components/mobile/BannerQueue';
 import { DangerZoneLayer } from '@/components/map/DangerZoneLayer';
 import { DangerWarningCard } from '@/components/mobile/DangerWarningCard';
 
@@ -30,7 +30,7 @@ export default function HomePage() {
         <NightWarningLayer />
         <DangerZoneLayer />
         <MapFAB />
-        <NightSafetyBanner />
+        <BannerQueue />
         <POICard />
         <DangerWarningCard />
       </main>

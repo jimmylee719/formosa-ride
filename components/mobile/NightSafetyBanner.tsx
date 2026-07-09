@@ -1,20 +1,15 @@
 'use client';
 // components/mobile/NightSafetyBanner.tsx — 夜間安全橫幅（Phase 7B，v3.0 C3）
-// 深藍底、白字；三個快捷鈕直接套用 POI 篩選。可關閉。
-// Phase 8C 通知優先順序佇列建立後，此橫幅將納入佇列管理。
-import { useState } from 'react';
+// 深藍底、白字；三個快捷鈕直接套用 POI 篩選。
+// Phase 8C 起為「受控元件」：顯示與關閉統一由 BannerQueue 管理（v10.0 單一佇列）。
 import { useMapStore } from '@/store/map-store';
 
-export function NightSafetyBanner() {
-  const isNightMode = useMapStore((s) => s.isNightMode);
+export function NightSafetyBanner({ onDismiss }: { onDismiss: () => void }) {
   const setActiveTypes = useMapStore((s) => s.setActiveTypes);
-  const [dismissed, setDismissed] = useState(false);
 
-  if (!isNightMode || dismissed) return null;
-
-  const quick = (types: Parameters<typeof setActiveTypes>[0], _label: string) => {
+  const quick = (types: Parameters<typeof setActiveTypes>[0]) => {
     setActiveTypes(types);
-    setDismissed(true); // 選了目標就收起橫幅，讓地圖露出來
+    onDismiss(); // 選了目標就收起橫幅，讓地圖露出來
   };
 
   return (
@@ -26,7 +21,7 @@ export function NightSafetyBanner() {
         <p className="alert-warning">🌙 現在是晚上 Now is Night Time</p>
         <button
           type="button"
-          onClick={() => setDismissed(true)}
+          onClick={() => onDismiss()}
           aria-label="關閉 Close"
           className="tap-target -mr-2 -mt-2 text-xl text-white/80"
         >
@@ -41,21 +36,21 @@ export function NightSafetyBanner() {
       <div className="mt-3 flex flex-wrap gap-2">
         <button
           type="button"
-          onClick={() => quick(['campsite_legal', 'campsite_wild'], '露營地')}
+          onClick={() => quick(['campsite_legal', 'campsite_wild'])}
           className="tap-target rounded-full bg-white/15 px-4 py-2 text-sm font-bold"
         >
           ⛺ 找附近的露營地
         </button>
         <button
           type="button"
-          onClick={() => quick(['temple_overnight'], '廟宇')}
+          onClick={() => quick(['temple_overnight'])}
           className="tap-target rounded-full bg-white/15 px-4 py-2 text-sm font-bold"
         >
           🏛️ 找附近的廟宇
         </button>
         <button
           type="button"
-          onClick={() => quick(['convenience_store'], '便利商店')}
+          onClick={() => quick(['convenience_store'])}
           className="tap-target rounded-full bg-white/15 px-4 py-2 text-sm font-bold"
         >
           🏪 找附近的 7-11
