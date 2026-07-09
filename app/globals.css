@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── 手機優先基礎樣式（v1.0 第四節 + v3.0 D1 節） ───────────── */
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-white text-neutral-text antialiased;
+  /* 主要資訊字體不小於 18px；此為全站基準 */
+  font-size: 18px;
+}
+
+/* 所有表單欄位字體最小 16px，防止 iOS Safari 聚焦時自動縮放 */
+input,
+select,
+textarea,
+button {
+  font-size: 16px;
+}
+
+/* 依重要程度的警示字級（v3.0 D1，絕不小於 14px） */
+@layer components {
+  .alert-critical {
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .alert-warning {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .info-primary {
+    font-size: 18px;
+  }
+  .info-secondary {
+    font-size: 16px;
+  }
+  /* 可點擊元件最小 44×44px（Apple HIG） */
+  .tap-target {
+    @apply min-h-tap min-w-tap;
+  }
+}
