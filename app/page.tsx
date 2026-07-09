@@ -5,6 +5,8 @@ import { BottomNavBar } from '@/components/mobile/BottomNavBar';
 import { MapContainer } from '@/components/map/MapContainer';
 import { POILayer } from '@/components/poi/POILayer';
 import { POICard } from '@/components/poi/POICard';
+import { MapFAB } from '@/components/mobile/MapFAB';
+import { FilterModal } from '@/components/mobile/FilterModal';
 
 export default function HomePage() {
   return (
@@ -13,9 +15,11 @@ export default function HomePage() {
       <main className="relative flex-1">
         <MapContainer />
         <POILayer />
+        <MapFAB />
         <POICard />
       </main>
       <BottomNavBar />
+      <FilterModal />
     </div>
   );
 }

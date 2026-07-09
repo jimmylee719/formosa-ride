@@ -24,6 +24,7 @@ function radiusForZoom(zoom: number): number {
 export function POILayer() {
   const map = useMapStore((s) => s.map);
   const setSelectedPoi = useMapStore((s) => s.setSelectedPoi);
+  const activeTypes = useMapStore((s) => s.activeTypes);
   const markersRef = useRef<Map<string, maplibregl.Marker>>(new Map());
 
   useEffect(() => {
@@ -46,9 +47,11 @@ export function POILayer() {
       const c = map.getCenter();
       controller?.abort();
       controller = new AbortController();
+      const typesParam =
+        activeTypes.length > 0 ? `&types=${activeTypes.join(',')}` : '';
       try {
         const res = await fetch(
-          `/api/pois?lat=${c.lat.toFixed(5)}&lng=${c.lng.toFixed(5)}&radius=${radiusForZoom(zoom)}`,
+          `/api/pois?lat=${c.lat.toFixed(5)}&lng=${c.lng.toFixed(5)}&radius=${radiusForZoom(zoom)}${typesParam}`,
           { signal: controller.signal }
         );
         if (!res.ok) return;
@@ -100,7 +103,7 @@ export function POILayer() {
       map.off('moveend', fetchPois);
       clearMarkers();
     };
-  }, [map, setSelectedPoi]);
+  }, [map, setSelectedPoi, activeTypes]);
 
   return null;
 }
