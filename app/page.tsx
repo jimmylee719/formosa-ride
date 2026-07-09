@@ -1,15 +1,17 @@
-// 暫時性首頁：Phase 3 將替換為地圖主頁面（強制登入牆於 Phase 9 加入）
+// 地圖主頁面（Phase 3）：Header 48px / 地圖全螢幕 / 底部導覽 64px（v1.0 §四）
+// 強制登入牆將於 Phase 9 加在此頁之前
+import { Header } from '@/components/ui/Header';
+import { BottomNavBar } from '@/components/mobile/BottomNavBar';
+import { MapContainer } from '@/components/map/MapContainer';
+
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 p-8">
-      <h1 className="text-3xl font-bold text-primary">
-        🚴 FormoSA Ride 環島通
-      </h1>
-      <p className="info-primary text-center">
-        台灣自行車環島完整資訊平台 — 建置中
-        <br />
-        Taiwan Bicycle Tour Guide — Under Construction
-      </p>
-    </main>
+    <div className="flex h-dvh flex-col overflow-hidden">
+      <Header />
+      <main className="relative flex-1">
+        <MapContainer />
+      </main>
+      <BottomNavBar />
+    </div>
   );
 }
