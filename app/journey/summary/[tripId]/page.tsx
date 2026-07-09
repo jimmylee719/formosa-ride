@@ -151,10 +151,14 @@ export default function TripSummaryPage() {
               {sharing ? '產生中… Generating…' : '📤 下載分享圖片 Share card'}
             </button>
 
-            {/* GPX 匯出（Phase 11D 接上） */}
-            <p className="mt-2 text-center text-sm text-neutral-text">
-              GPX 匯出功能即將推出 · GPX export coming soon
-            </p>
+            {/* GPX 匯出（Phase 11D）：下載後可匯入 Garmin/Strava/Komoot 留存 */}
+            <a
+              href={`/api/trips/${tripId}/export-gpx?device=${typeof window !== 'undefined' ? getDeviceId() : ''}`}
+              download
+              className="tap-target mt-2 flex w-full items-center justify-center rounded-xl border border-neutral-border bg-white py-3 font-bold"
+            >
+              📍 匯出 GPX 檔 Export GPX
+            </a>
 
             {/* 每日清單 */}
             <section className="mt-4 rounded-2xl bg-white p-4">
