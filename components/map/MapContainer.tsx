@@ -12,7 +12,7 @@ export function MapContainer() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
-  const { center, zoom, setView } = useMapStore();
+  const { center, zoom, setView, setMap } = useMapStore();
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -60,7 +60,9 @@ export function MapContainer() {
       (window as unknown as Record<string, unknown>).__map = map;
     }
     mapRef.current = map;
+    setMap(map);
     return () => {
+      setMap(null);
       map.remove();
       mapRef.current = null;
     };

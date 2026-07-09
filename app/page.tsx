@@ -3,6 +3,8 @@
 import { Header } from '@/components/ui/Header';
 import { BottomNavBar } from '@/components/mobile/BottomNavBar';
 import { MapContainer } from '@/components/map/MapContainer';
+import { POILayer } from '@/components/poi/POILayer';
+import { POICard } from '@/components/poi/POICard';
 
 export default function HomePage() {
   return (
@@ -10,6 +12,8 @@ export default function HomePage() {
       <Header />
       <main className="relative flex-1">
         <MapContainer />
+        <POILayer />
+        <POICard />
       </main>
       <BottomNavBar />
     </div>
