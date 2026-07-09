@@ -1,0 +1,42 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# 環境變數 — 絕不提交任何金鑰（安全規範 5.4）
+.env
+.env.local
+.env*.local
+
+# 管理員初始化腳本（Phase 0A，執行後即刪，絕不提交 — v11.0 B1）
+scripts/seed-admin.ts
+
+# 內部規格文件與建置計畫 — repo 為公開，內含初始帳密與商業規格，不上傳
+# （若日後將 repo 轉為 Private 想一併版控，移除以下兩行即可）
+specs/
+MASTER_BUILD_PLAN.md
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# 資料庫備份檔（由 GitHub Actions 備份至獨立私有倉庫，不混入主 repo）
+backup-*.sql
