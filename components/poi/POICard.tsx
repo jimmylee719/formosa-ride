@@ -3,6 +3,8 @@
 import { useMapStore } from '@/store/map-store';
 import { POI_ICONS, POI_LABELS } from '@/lib/poi-icons';
 import { GoogleMapsButton } from '@/components/poi/GoogleMapsButton';
+import { VerifyButton } from '@/components/poi/VerifyButton';
+import { isRecentlyVerified } from '@/types/poi';
 
 export function POICard() {
   const poi = useMapStore((s) => s.selectedPoi);
@@ -27,6 +29,11 @@ export function POICard() {
           <h2 className="info-primary font-bold">{poi.name_zh}</h2>
           {poi.name_en && poi.name_en !== poi.name_zh && (
             <p className="info-secondary">{poi.name_en}</p>
+          )}
+          {isRecentlyVerified(poi) && (
+            <span className="mt-1 inline-block rounded-full bg-safe-bg px-3 py-0.5 text-sm font-bold text-safe-text">
+              ✅ 近期已驗證 · Recently verified
+            </span>
           )}
         </div>
         <button
@@ -73,6 +80,10 @@ export function POICard() {
           📞 {poi.phone}
         </a>
       )}
+
+      <div className="mt-3">
+        <VerifyButton poiId={poi.id} />
+      </div>
 
       <div className="mt-3">
         <GoogleMapsButton poi={poi} />

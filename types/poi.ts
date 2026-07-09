@@ -38,4 +38,17 @@ export interface POIRecord {
   allows_camping: boolean;
   has_charging: boolean;
   water_available: boolean;
+  /** 社群驗證統計（Phase 4A，由 /api/pois 合併自 pois 表） */
+  verification_count: number;
+  last_verified_at: string | null;
+}
+
+/** 「近期已驗證」判斷（v7.0 E3：30 天內累積 ≥3 人）*/
+export function isRecentlyVerified(poi: {
+  verification_count: number;
+  last_verified_at: string | null;
+}): boolean {
+  if (poi.verification_count < 3 || !poi.last_verified_at) return false;
+  const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+  return Date.now() - new Date(poi.last_verified_at).getTime() < THIRTY_DAYS_MS;
 }

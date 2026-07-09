@@ -50,8 +50,38 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Query failed' }, { status: 500 });
   }
 
+  // Phase 4A：合併社群驗證統計（RPC 回傳未含此欄位；Phase 9 改寫函數時一併收編）
+  type RpcRow = { id: string } & Record<string, unknown>;
+  const rows = (data ?? []) as RpcRow[];
+  let pois: RpcRow[] = rows.map((r) => ({
+    ...r,
+    verification_count: 0,
+    last_verified_at: null,
+  }));
+
+  if (rows.length > 0) {
+    const ids = rows.map((r) => r.id);
+    const { data: vData } = await supabase
+      .from('pois')
+      .select('id, verification_count, last_verified_at')
+      .in('id', ids);
+    if (vData) {
+      const vMap = new Map(vData.map((v) => [v.id as string, v]));
+      pois = pois.map((p) => {
+        const v = vMap.get(p.id);
+        return v
+          ? {
+              ...p,
+              verification_count: v.verification_count ?? 0,
+              last_verified_at: v.last_verified_at ?? null,
+            }
+          : p;
+      });
+    }
+  }
+
   return NextResponse.json(
-    { pois: data ?? [] },
+    { pois },
     { headers: { 'Cache-Control': 'public, max-age=60, stale-while-revalidate=300' } }
   );
 }
