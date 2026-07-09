@@ -6,6 +6,7 @@ import { Header } from '@/components/ui/Header';
 import { BottomNavBar } from '@/components/mobile/BottomNavBar';
 import { WindCompass } from '@/components/weather/WindCompass';
 import { TAIWAN_COUNTIES } from '@/lib/taiwan-counties';
+import { getOfflineWeather, staleness } from '@/lib/offline-store';
 import type { WeatherBundle } from '@/lib/weather';
 
 function weekdayZh(dateStr: string): string {
@@ -22,10 +23,12 @@ function WeatherContent() {
   );
   const [bundle, setBundle] = useState<WeatherBundle | null>(null);
   const [state, setState] = useState<'loading' | 'ok' | 'error'>('loading');
+  const [offlineSnapshotAt, setOfflineSnapshotAt] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
     setState('loading');
+    setOfflineSnapshotAt(null);
     fetch(`/api/weather?county=${encodeURIComponent(county)}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
       .then((d: WeatherBundle) => {
@@ -33,7 +36,18 @@ function WeatherContent() {
         setBundle(d);
         setState('ok');
       })
-      .catch(() => alive && setState('error'));
+      .catch(async () => {
+        // 離線回退：讀離線包的天氣快照（Phase 11B，v7.0 C5 誠實標注時效）
+        const snap = await getOfflineWeather(county);
+        if (!alive) return;
+        if (snap) {
+          setBundle(snap);
+          setOfflineSnapshotAt(snap.snapshotAt);
+          setState('ok');
+        } else {
+          setState('error');
+        }
+      });
     return () => {
       alive = false;
     };
@@ -74,6 +88,18 @@ function WeatherContent() {
 
       {state === 'ok' && bundle && (
         <>
+          {offlineSnapshotAt && (
+            <p
+              role="alert"
+              className="mt-3 rounded-xl border-2 border-warning-border bg-warning-bg p-3 info-secondary text-warning-text"
+            >
+              ⚠️ 此為離線快取資料，擷取於 {staleness(offlineSnapshotAt).zh}
+              ，實際天氣可能已改變
+              <br />
+              Offline snapshot from {staleness(offlineSnapshotAt).en} — weather may
+              have changed
+            </p>
+          )}
           {/* 特報橫幅（含颱風） */}
           {bundle.hazards.map((h) => (
             <div

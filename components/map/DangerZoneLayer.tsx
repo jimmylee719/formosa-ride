@@ -221,14 +221,19 @@ export function DangerZoneLayer() {
     return () => {
       disposed = true;
       if (flashTimer.current) clearInterval(flashTimer.current);
-      map.off('moveend', upsertDangerSource);
-      map.off('click', DANGER_LAYER, onClickDanger);
-      map.off('click', RESTRICTED_LAYER, onClickRestricted);
-      for (const layer of [DANGER_LAYER, RESTRICTED_LAYER]) {
-        if (map.getLayer(layer)) map.removeLayer(layer);
-      }
-      for (const src of [DANGER_SOURCE, RESTRICTED_SOURCE]) {
-        if (map.getSource(src)) map.removeSource(src);
+      // 地圖可能已被 MapContainer cleanup 移除（頁面導航時的 unmount 順序），需防護
+      try {
+        map.off('moveend', upsertDangerSource);
+        map.off('click', DANGER_LAYER, onClickDanger);
+        map.off('click', RESTRICTED_LAYER, onClickRestricted);
+        for (const layer of [DANGER_LAYER, RESTRICTED_LAYER]) {
+          if (map.getLayer(layer)) map.removeLayer(layer);
+        }
+        for (const src of [DANGER_SOURCE, RESTRICTED_SOURCE]) {
+          if (map.getSource(src)) map.removeSource(src);
+        }
+      } catch {
+        /* 地圖已銷毀，無需清理 */
       }
     };
   }, [map, isNightMode, setSelectedDanger]);

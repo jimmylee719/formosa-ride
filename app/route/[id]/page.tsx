@@ -6,6 +6,7 @@ import { Header } from '@/components/ui/Header';
 import { BottomNavBar } from '@/components/mobile/BottomNavBar';
 import { RouteDetailMap } from '@/components/route/RouteDetailMap';
 import { ElevationProfile } from '@/components/route/ElevationProfile';
+import { OfflineDownloadButton } from '@/components/route/OfflineDownloadButton';
 import { getRoute } from '@/lib/route-queries';
 import { createAnonServerClient } from '@/lib/supabase-server';
 import { DIFFICULTY_LABELS, ROUTE_TYPE_LABELS } from '@/types/route';
@@ -127,6 +128,9 @@ export default async function RouteDetailPage({
         >
           🗺️ 在主地圖檢視 · View on main map
         </Link>
+
+        {/* 離線下載包（Phase 11B） */}
+        <OfflineDownloadButton routeId={route.id} />
 
         {/* 介紹 */}
         {route.description_zh && (

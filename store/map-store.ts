@@ -34,6 +34,8 @@ interface MapState {
   /** POI 篩選（Phase 4B）：空陣列 = 顯示全部類型 */
   activeTypes: POIType[];
   isFilterOpen: boolean;
+  /** 目前顯示的是離線包資料（Phase 11B：fetch 失敗時回退 IndexedDB） */
+  usingOfflineData: boolean;
   setMap: (map: maplibregl.Map | null) => void;
   setView: (center: [number, number], zoom: number) => void;
   setSelectedPoi: (poi: POIRecord | null) => void;
@@ -46,6 +48,7 @@ interface MapState {
   setActiveTypes: (types: POIType[]) => void;
   clearFilters: () => void;
   setFilterOpen: (open: boolean) => void;
+  setUsingOfflineData: (on: boolean) => void;
 }
 
 export const useMapStore = create<MapState>((set) => ({
@@ -57,6 +60,7 @@ export const useMapStore = create<MapState>((set) => ({
   isNightMode: false,
   activeTypes: [],
   isFilterOpen: false,
+  usingOfflineData: false,
   setMap: (map) => set({ map }),
   setView: (center, zoom) => set({ center, zoom }),
   setSelectedPoi: (poi) => set({ selectedPoi: poi }),
@@ -80,4 +84,5 @@ export const useMapStore = create<MapState>((set) => ({
   setActiveTypes: (types) => set({ activeTypes: types }),
   clearFilters: () => set({ activeTypes: [] }),
   setFilterOpen: (open) => set({ isFilterOpen: open }),
+  setUsingOfflineData: (on) => set({ usingOfflineData: on }),
 }));

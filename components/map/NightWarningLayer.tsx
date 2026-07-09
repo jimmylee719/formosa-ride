@@ -99,10 +99,14 @@ export function NightWarningLayer() {
 
     return () => {
       disposed = true;
-      map.off('style.load', add);
-      map.off('click', LAYER_ID, onClick);
-      if (map.getLayer(LAYER_ID)) map.removeLayer(LAYER_ID);
-      if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+      try {
+        map.off('style.load', add);
+        map.off('click', LAYER_ID, onClick);
+        if (map.getLayer(LAYER_ID)) map.removeLayer(LAYER_ID);
+        if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+      } catch {
+        /* 地圖已銷毀 */
+      }
     };
   }, [map, isNightMode]);
 

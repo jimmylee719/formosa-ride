@@ -67,9 +67,13 @@ export function RouteLayer() {
 
     return () => {
       disposed = true;
-      if (readd) map.off('style.load', readd);
-      if (map.getLayer(LAYER_ID)) map.removeLayer(LAYER_ID);
-      if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+      try {
+        if (readd) map.off('style.load', readd);
+        if (map.getLayer(LAYER_ID)) map.removeLayer(LAYER_ID);
+        if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+      } catch {
+        /* 地圖已銷毀 */
+      }
     };
   }, [map, routeId]);
 

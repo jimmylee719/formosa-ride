@@ -7,6 +7,7 @@ import { useEffect, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
 import { useMapStore } from '@/store/map-store';
 import { POI_ICONS } from '@/lib/poi-icons';
+import { getOfflinePoisNear } from '@/lib/offline-store';
 import type { POIRecord } from '@/types/poi';
 
 const MIN_POI_ZOOM = 10;
@@ -25,6 +26,7 @@ export function POILayer() {
   const map = useMapStore((s) => s.map);
   const setSelectedPoi = useMapStore((s) => s.setSelectedPoi);
   const activeTypes = useMapStore((s) => s.activeTypes);
+  const setUsingOfflineData = useMapStore((s) => s.setUsingOfflineData);
   const markersRef = useRef<Map<string, maplibregl.Marker>>(new Map());
 
   useEffect(() => {
@@ -38,26 +40,7 @@ export function POILayer() {
       markers.clear();
     };
 
-    const fetchPois = async () => {
-      const zoom = map.getZoom();
-      if (zoom < MIN_POI_ZOOM) {
-        clearMarkers();
-        return;
-      }
-      const c = map.getCenter();
-      controller?.abort();
-      controller = new AbortController();
-      const typesParam =
-        activeTypes.length > 0 ? `&types=${activeTypes.join(',')}` : '';
-      try {
-        const res = await fetch(
-          `/api/pois?lat=${c.lat.toFixed(5)}&lng=${c.lng.toFixed(5)}&radius=${radiusForZoom(zoom)}${typesParam}`,
-          { signal: controller.signal }
-        );
-        if (!res.ok) return;
-        const { pois } = (await res.json()) as { pois: POIRecord[] };
-        if (disposed) return;
-
+    const renderPois = (pois: POIRecord[]) => {
         const wanted = pois.slice(0, MAX_MARKERS);
         const wantedIds = new Set(wanted.map((p) => p.id));
 
@@ -87,9 +70,43 @@ export function POILayer() {
             .addTo(map);
           markers.set(poi.id, marker);
         }
+    };
+
+    const fetchPois = async () => {
+      const zoom = map.getZoom();
+      if (zoom < MIN_POI_ZOOM) {
+        clearMarkers();
+        return;
+      }
+      const c = map.getCenter();
+      controller?.abort();
+      controller = new AbortController();
+      const typesParam =
+        activeTypes.length > 0 ? `&types=${activeTypes.join(',')}` : '';
+      try {
+        const res = await fetch(
+          `/api/pois?lat=${c.lat.toFixed(5)}&lng=${c.lng.toFixed(5)}&radius=${radiusForZoom(zoom)}${typesParam}`,
+          { signal: controller.signal }
+        );
+        if (!res.ok) throw new Error(String(res.status));
+        const { pois } = (await res.json()) as { pois: POIRecord[] };
+        if (disposed) return;
+        setUsingOfflineData(false);
+        renderPois(pois);
       } catch (err) {
-        if ((err as Error).name !== 'AbortError') {
-          console.error('[POILayer] 載入 POI 失敗:', err);
+        if ((err as Error).name === 'AbortError' || disposed) return;
+        // 離線回退：改讀已下載的離線包（Phase 11B，v7.0 C）
+        try {
+          const { pois } = await getOfflinePoisNear(c.lat, c.lng, radiusForZoom(zoom));
+          const filtered =
+            activeTypes.length > 0
+              ? pois.filter((p) => activeTypes.includes(p.type))
+              : pois;
+          if (disposed) return;
+          if (filtered.length > 0) setUsingOfflineData(true);
+          renderPois(filtered);
+        } catch {
+          console.error('[POILayer] 線上與離線載入皆失敗');
         }
       }
     };
@@ -103,7 +120,7 @@ export function POILayer() {
       map.off('moveend', fetchPois);
       clearMarkers();
     };
-  }, [map, setSelectedPoi, activeTypes]);
+  }, [map, setSelectedPoi, activeTypes, setUsingOfflineData]);
 
   return null;
 }

@@ -2,6 +2,7 @@
 // components/route/ElevationProfile.tsx — 海拔剖面圖（Phase 6）
 // 單一序列面積圖：細線 2px、輔助格線低調、觸控/滑鼠十字提示層、文字用墨色。
 import { useEffect, useRef, useState } from 'react';
+import { getOfflineElevation } from '@/lib/offline-store';
 import type { ProfilePoint, ElevationProfileResult } from '@/lib/elevation';
 
 const W = 360;
@@ -23,7 +24,17 @@ export function ElevationProfile({ routeId }: { routeId: string }) {
         setData(d);
         setState('ok');
       })
-      .catch(() => alive && setState('error'));
+      .catch(async () => {
+        // 離線回退（Phase 11B）
+        const offline = await getOfflineElevation(routeId);
+        if (!alive) return;
+        if (offline) {
+          setData(offline);
+          setState('ok');
+        } else {
+          setState('error');
+        }
+      });
     return () => {
       alive = false;
     };
