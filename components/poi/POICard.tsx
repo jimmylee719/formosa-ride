@@ -4,7 +4,7 @@ import { useMapStore } from '@/store/map-store';
 import { POI_ICONS, POI_LABELS } from '@/lib/poi-icons';
 import { GoogleMapsButton } from '@/components/poi/GoogleMapsButton';
 import { VerifyButton } from '@/components/poi/VerifyButton';
-import { isRecentlyVerified } from '@/types/poi';
+import { isRecentlyVerified, ACCOMMODATION_SUBTYPES } from '@/types/poi';
 
 export function POICard() {
   const poi = useMapStore((s) => s.selectedPoi);
@@ -13,6 +13,11 @@ export function POICard() {
   if (!poi) return null;
 
   const label = POI_LABELS[poi.type];
+  // 住宿子類型標籤（Phase 15B）
+  const subtype =
+    poi.type === 'accommodation' && poi.accommodation_subtype
+      ? ACCOMMODATION_SUBTYPES.find((s) => s.value === poi.accommodation_subtype)
+      : undefined;
   const features: string[] = [];
   if (poi.has_shower) features.push('🚿 淋浴 Shower');
   if (poi.allows_camping) features.push('⛺ 可紮營 Camping OK');
@@ -25,6 +30,11 @@ export function POICard() {
         <div>
           <p className="info-secondary text-neutral-text">
             {POI_ICONS[poi.type]} {label.zh} · {label.en}
+            {subtype && (
+              <span className="ml-2 rounded-full bg-info-bg px-2 py-0.5 text-sm text-info-text">
+                {subtype.en} {subtype.zh}
+              </span>
+            )}
           </p>
           <h2 className="info-primary font-bold">{poi.name_zh}</h2>
           {poi.name_en && poi.name_en !== poi.name_zh && (

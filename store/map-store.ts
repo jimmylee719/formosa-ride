@@ -33,6 +33,8 @@ interface MapState {
   isNightMode: boolean;
   /** POI 篩選（Phase 4B）：空陣列 = 顯示全部類型 */
   activeTypes: POIType[];
+  /** 住宿子類型篩選（Phase 15B，v8.0 C3）：僅在選了住宿時生效；空 = 全部住宿 */
+  accommodationSubtypes: string[];
   isFilterOpen: boolean;
   /** 目前顯示的是離線包資料（Phase 11B：fetch 失敗時回退 IndexedDB） */
   usingOfflineData: boolean;
@@ -46,6 +48,7 @@ interface MapState {
   toggleGroup: (types: POIType[]) => void;
   /** 直接設定篩選（夜間橫幅快捷鈕等情境用） */
   setActiveTypes: (types: POIType[]) => void;
+  toggleAccommodationSubtype: (subtype: string) => void;
   clearFilters: () => void;
   setFilterOpen: (open: boolean) => void;
   setUsingOfflineData: (on: boolean) => void;
@@ -59,6 +62,7 @@ export const useMapStore = create<MapState>((set) => ({
   selectedDanger: null,
   isNightMode: false,
   activeTypes: [],
+  accommodationSubtypes: [],
   isFilterOpen: false,
   usingOfflineData: false,
   setMap: (map) => set({ map }),
@@ -82,7 +86,13 @@ export const useMapStore = create<MapState>((set) => ({
       };
     }),
   setActiveTypes: (types) => set({ activeTypes: types }),
-  clearFilters: () => set({ activeTypes: [] }),
+  toggleAccommodationSubtype: (subtype) =>
+    set((s) => ({
+      accommodationSubtypes: s.accommodationSubtypes.includes(subtype)
+        ? s.accommodationSubtypes.filter((x) => x !== subtype)
+        : [...s.accommodationSubtypes, subtype],
+    })),
+  clearFilters: () => set({ activeTypes: [], accommodationSubtypes: [] }),
   setFilterOpen: (open) => set({ isFilterOpen: open }),
   setUsingOfflineData: (on) => set({ usingOfflineData: on }),
 }));

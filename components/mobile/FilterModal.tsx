@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useMapStore } from '@/store/map-store';
 import { POI_CATEGORY_GROUPS } from '@/lib/poi-category-groups';
 import { POI_ICONS, POI_LABELS } from '@/lib/poi-icons';
+import { ACCOMMODATION_SUBTYPES } from '@/types/poi';
 
 export function FilterModal() {
   const isOpen = useMapStore((s) => s.isFilterOpen);
@@ -13,6 +14,8 @@ export function FilterModal() {
   const activeTypes = useMapStore((s) => s.activeTypes);
   const toggleType = useMapStore((s) => s.toggleType);
   const toggleGroup = useMapStore((s) => s.toggleGroup);
+  const accommodationSubtypes = useMapStore((s) => s.accommodationSubtypes);
+  const toggleAccommodationSubtype = useMapStore((s) => s.toggleAccommodationSubtype);
   const clearFilters = useMapStore((s) => s.clearFilters);
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -109,6 +112,34 @@ export function FilterModal() {
                       </button>
                     );
                   })}
+                </div>
+              )}
+
+              {/* 住宿子類型（Phase 15B，v8.0 C3 漸進式揭露）：選了住宿才出現 */}
+              {group.key === 'rest' && activeTypes.includes('accommodation') && (
+                <div className="border-t border-neutral-border p-3">
+                  <p className="text-sm text-neutral-text">
+                    Accommodation type 住宿類型（optional 可略過）
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {ACCOMMODATION_SUBTYPES.map((s) => {
+                      const on = accommodationSubtypes.includes(s.value);
+                      return (
+                        <button
+                          key={s.value}
+                          type="button"
+                          onClick={() => toggleAccommodationSubtype(s.value)}
+                          className={`rounded-full border px-3 py-1.5 text-sm ${
+                            on
+                              ? 'border-safe-border bg-safe-bg font-bold text-safe-text'
+                              : 'border-neutral-border bg-white'
+                          }`}
+                        >
+                          {s.en} {s.zh}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>

@@ -35,6 +35,12 @@ export async function GET(req: NextRequest) {
     if (types.length === 0) types = null;
   }
 
+  // 住宿子類型（Phase 15B，v8.0 C3）：只縮小 accommodation，其他類型不受影響
+  const VALID_SUBTYPES = new Set(['hotel', 'guesthouse', 'homestay', 'hostel', 'capsule_hotel']);
+  const subtypes = (sp.get('subtypes') ?? '')
+    .split(',')
+    .filter((s) => VALID_SUBTYPES.has(s));
+
   const supabase = createAnonServerClient();
   const { data, error } = await supabase.rpc('get_pois_near_point', {
     p_lat: lat,
@@ -50,34 +56,53 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Query failed' }, { status: 500 });
   }
 
-  // Phase 4A：合併社群驗證統計（RPC 回傳未含此欄位；Phase 9 改寫函數時一併收編）
-  type RpcRow = { id: string } & Record<string, unknown>;
+  // Phase 4A / 15B：合併 RPC 未回傳的欄位（驗證統計、住宿子類型；Phase 9 改寫函數時一併收編）
+  type RpcRow = { id: string; type: string } & Record<string, unknown>;
   const rows = (data ?? []) as RpcRow[];
   let pois: RpcRow[] = rows.map((r) => ({
     ...r,
     verification_count: 0,
     last_verified_at: null,
+    accommodation_subtype: null,
   }));
 
   if (rows.length > 0) {
+    // ids 需分批：一次塞數百個 UUID 會超過 URL 長度上限而靜默失敗（Phase 15B 實測）
     const ids = rows.map((r) => r.id);
-    const { data: vData } = await supabase
-      .from('pois')
-      .select('id, verification_count, last_verified_at')
-      .in('id', ids);
-    if (vData) {
-      const vMap = new Map(vData.map((v) => [v.id as string, v]));
-      pois = pois.map((p) => {
-        const v = vMap.get(p.id);
-        return v
-          ? {
-              ...p,
-              verification_count: v.verification_count ?? 0,
-              last_verified_at: v.last_verified_at ?? null,
-            }
-          : p;
-      });
+    type MergeRow = {
+      id: string;
+      verification_count: number | null;
+      last_verified_at: string | null;
+      accommodation_subtype: string | null;
+    };
+    const vMap = new Map<string, MergeRow>();
+    for (let i = 0; i < ids.length; i += 100) {
+      const { data: vData } = await supabase
+        .from('pois')
+        .select('id, verification_count, last_verified_at, accommodation_subtype')
+        .in('id', ids.slice(i, i + 100));
+      for (const v of (vData ?? []) as MergeRow[]) vMap.set(v.id, v);
     }
+    pois = pois.map((p) => {
+      const v = vMap.get(p.id);
+      return v
+        ? {
+            ...p,
+            verification_count: v.verification_count ?? 0,
+            last_verified_at: v.last_verified_at ?? null,
+            accommodation_subtype: v.accommodation_subtype ?? null,
+          }
+        : p;
+    });
+  }
+
+  // 子類型過濾：僅作用於住宿（v8.0 C3）
+  if (subtypes.length > 0) {
+    pois = pois.filter(
+      (p) =>
+        p.type !== 'accommodation' ||
+        subtypes.includes(String(p.accommodation_subtype ?? ''))
+    );
   }
 
   return NextResponse.json(

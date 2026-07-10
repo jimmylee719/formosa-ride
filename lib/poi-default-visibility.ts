@@ -4,7 +4,8 @@
 //       使用者手動選了篩選 → 完全尊重使用者選擇，不套用此規則。
 import type { POIType } from '@/types/poi';
 
-/** zoom < 12：稀少且對環島規劃最關鍵 */
+/** zoom < 12：稀少且對環島規劃最關鍵
+ *（Phase 15B 起 accommodation 有 1.5 萬筆，移到中層避免拉遠時洗版）*/
 const TIER_FAR: POIType[] = [
   'bicycle_repair',
   'train_station',
@@ -12,10 +13,9 @@ const TIER_FAR: POIType[] = [
   'scenic_attraction',
   'campsite_legal',
   'temple_overnight',
-  'accommodation',
 ];
 
-/** zoom 12–13：加入補給與安全類 */
+/** zoom 12–13：加入補給、安全與住宿 */
 const TIER_MID: POIType[] = [
   ...TIER_FAR,
   'convenience_store',
@@ -23,6 +23,7 @@ const TIER_MID: POIType[] = [
   'water_station',
   'pump_station',
   'police',
+  'accommodation',
 ];
 
 /** zoom ≥ 14：全部顯示（含公廁等高密度類型） */

@@ -27,6 +27,7 @@ export function POILayer() {
   const map = useMapStore((s) => s.map);
   const setSelectedPoi = useMapStore((s) => s.setSelectedPoi);
   const activeTypes = useMapStore((s) => s.activeTypes);
+  const accommodationSubtypes = useMapStore((s) => s.accommodationSubtypes);
   const setUsingOfflineData = useMapStore((s) => s.setUsingOfflineData);
   const markersRef = useRef<Map<string, maplibregl.Marker>>(new Map());
 
@@ -89,9 +90,14 @@ export function POILayer() {
         effectiveTypes && effectiveTypes.length > 0
           ? `&types=${effectiveTypes.join(',')}`
           : '';
+      // 住宿子類型（Phase 15B）：僅在使用者選了住宿時傳遞
+      const subtypesParam =
+        activeTypes.includes('accommodation') && accommodationSubtypes.length > 0
+          ? `&subtypes=${accommodationSubtypes.join(',')}`
+          : '';
       try {
         const res = await fetch(
-          `/api/pois?lat=${c.lat.toFixed(5)}&lng=${c.lng.toFixed(5)}&radius=${radiusForZoom(zoom)}${typesParam}`,
+          `/api/pois?lat=${c.lat.toFixed(5)}&lng=${c.lng.toFixed(5)}&radius=${radiusForZoom(zoom)}${typesParam}${subtypesParam}`,
           { signal: controller.signal }
         );
         if (!res.ok) throw new Error(String(res.status));
@@ -127,7 +133,7 @@ export function POILayer() {
       map.off('moveend', fetchPois);
       clearMarkers();
     };
-  }, [map, setSelectedPoi, activeTypes, setUsingOfflineData]);
+  }, [map, setSelectedPoi, activeTypes, accommodationSubtypes, setUsingOfflineData]);
 
   return null;
 }

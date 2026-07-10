@@ -19,6 +19,17 @@ export type POIType =
   | 'restaurant'
   | 'accommodation';
 
+/** 住宿子類型（v8.0 C2：純文字非 enum） */
+export const ACCOMMODATION_SUBTYPES = [
+  { value: 'hotel', en: 'Hotel', zh: '觀光旅館' },
+  { value: 'guesthouse', en: 'Inn / B&B', zh: '一般旅館' },
+  { value: 'homestay', en: 'Homestay', zh: '民宿' },
+  { value: 'hostel', en: 'Hostel', zh: '青年旅舍' },
+  { value: 'capsule_hotel', en: 'Capsule', zh: '膠囊旅館' },
+] as const;
+
+export type AccommodationSubtype = (typeof ACCOMMODATION_SUBTYPES)[number]['value'];
+
 export interface POIRecord {
   id: string;
   name_zh: string;
@@ -41,6 +52,8 @@ export interface POIRecord {
   /** 社群驗證統計（Phase 4A，由 /api/pois 合併自 pois 表） */
   verification_count: number;
   last_verified_at: string | null;
+  /** 住宿子類型（Phase 15B，由 /api/pois 合併；僅 type='accommodation' 有值） */
+  accommodation_subtype: string | null;
 }
 
 /** 「近期已驗證」判斷（v7.0 E3：30 天內累積 ≥3 人）*/
