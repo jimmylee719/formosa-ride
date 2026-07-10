@@ -7,6 +7,7 @@ import { useEffect, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
 import { useMapStore } from '@/store/map-store';
 import { POI_ICONS } from '@/lib/poi-icons';
+import { defaultTypesForZoom } from '@/lib/poi-default-visibility';
 import { getOfflinePoisNear } from '@/lib/offline-store';
 import type { POIRecord } from '@/types/poi';
 
@@ -81,8 +82,13 @@ export function POILayer() {
       const c = map.getCenter();
       controller?.abort();
       controller = new AbortController();
+      // 使用者選了篩選 → 依使用者；沒選 → 依縮放層級漸進顯示（避免地圖塞滿）
+      const effectiveTypes =
+        activeTypes.length > 0 ? activeTypes : defaultTypesForZoom(zoom);
       const typesParam =
-        activeTypes.length > 0 ? `&types=${activeTypes.join(',')}` : '';
+        effectiveTypes && effectiveTypes.length > 0
+          ? `&types=${effectiveTypes.join(',')}`
+          : '';
       try {
         const res = await fetch(
           `/api/pois?lat=${c.lat.toFixed(5)}&lng=${c.lng.toFixed(5)}&radius=${radiusForZoom(zoom)}${typesParam}`,
@@ -98,10 +104,11 @@ export function POILayer() {
         // 離線回退：改讀已下載的離線包（Phase 11B，v7.0 C）
         try {
           const { pois } = await getOfflinePoisNear(c.lat, c.lng, radiusForZoom(zoom));
-          const filtered =
-            activeTypes.length > 0
-              ? pois.filter((p) => activeTypes.includes(p.type))
-              : pois;
+          const offlineTypes =
+            activeTypes.length > 0 ? activeTypes : defaultTypesForZoom(map.getZoom());
+          const filtered = offlineTypes
+            ? pois.filter((p) => offlineTypes.includes(p.type))
+            : pois;
           if (disposed) return;
           if (filtered.length > 0) setUsingOfflineData(true);
           renderPois(filtered);

@@ -21,12 +21,12 @@ export function FilterModal() {
   return (
     <div className="fixed inset-0 z-30 flex flex-col bg-white">
       <div className="flex h-12 shrink-0 items-center justify-between border-b border-neutral-border px-3">
-        <h2 className="info-primary font-bold">篩選地點 · Filter</h2>
+        <h2 className="info-primary font-bold">Filter places · 篩選地點</h2>
         <button
           type="button"
           onClick={() => setFilterOpen(false)}
           className="tap-target rounded-full text-2xl leading-none"
-          aria-label="關閉 Close"
+          aria-label="Close 關閉"
         >
           ✕
         </button>
@@ -34,9 +34,9 @@ export function FilterModal() {
 
       <div className="flex-1 overflow-y-auto p-4">
         <p className="info-secondary mb-3 text-neutral-text">
-          點大分類快速選取，或展開挑選細項
+          Tap a category to select all, or expand for details
           <br />
-          Tap a category, or expand for details
+          點大分類快速選取，或展開挑選細項
         </p>
 
         {POI_CATEGORY_GROUPS.map((group) => {
@@ -68,18 +68,18 @@ export function FilterModal() {
                   </span>
                   <span>
                     <span className="info-primary block">
-                      {group.label_zh}
-                      {selectedCount > 0 && `（已選 ${selectedCount}）`}
+                      {group.label_en}
+                      {selectedCount > 0 && ` (${selectedCount} selected)`}
                     </span>
                     <span className="info-secondary text-neutral-text">
-                      {group.label_en}
+                      {group.label_zh}
                     </span>
                   </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setExpanded(isExpanded ? null : group.key)}
-                  aria-label={`展開${group.label_zh}細項`}
+                  aria-label={`Expand ${group.label_en} 展開${group.label_zh}細項`}
                   aria-expanded={isExpanded}
                   className="tap-target rounded-r-2xl border-l border-neutral-border px-4 text-xl text-neutral-text"
                 >
@@ -102,7 +102,10 @@ export function FilterModal() {
                             : 'border-neutral-border bg-white'
                         }`}
                       >
-                        {POI_ICONS[type]} {POI_LABELS[type].zh}
+                        {POI_ICONS[type]} {POI_LABELS[type].en}
+                        <span className="ml-1 text-sm text-neutral-text">
+                          {POI_LABELS[type].zh}
+                        </span>
                       </button>
                     );
                   })}
@@ -119,7 +122,7 @@ export function FilterModal() {
           onClick={clearFilters}
           className="tap-target flex-1 rounded-xl border border-neutral-border py-3 info-primary"
         >
-          清除 Clear
+          Clear 清除
         </button>
         <button
           type="button"
@@ -127,8 +130,8 @@ export function FilterModal() {
           className="tap-target flex-1 rounded-xl bg-primary py-3 font-bold text-white info-primary"
         >
           {activeTypes.length === 0
-            ? '顯示全部 Show all'
-            : `套用（${activeTypes.length}）Apply`}
+            ? 'Auto display 自動顯示'
+            : `Apply (${activeTypes.length}) 套用`}
         </button>
       </div>
     </div>

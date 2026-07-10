@@ -12,7 +12,7 @@ export function MapFAB() {
       onClick={() => setFilterOpen(true)}
       className="tap-target absolute left-3 top-3 z-10 flex items-center gap-2 rounded-full bg-white px-4 py-2 font-bold shadow-md"
     >
-      🔍 篩選 Filter
+      🔍 Filter 篩選
       {activeCount > 0 && (
         <span className="rounded-full bg-primary px-2 py-0.5 text-sm text-white">
           {activeCount}
