@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { DevSwCleanup } from '@/components/ui/DevSwCleanup';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://formosaride.com';
 
@@ -25,6 +26,12 @@ export const metadata: Metadata = {
   creator: 'Camper Road Taiwan',
   publisher: 'Camper Road Taiwan',
   formatDetection: { telephone: false },
+  manifest: '/manifest.json', // PWA（Phase 17）
+  appleWebApp: { capable: true, statusBarStyle: 'default', title: 'FormoSA Ride' },
+  icons: {
+    icon: '/icons/icon-192.png',
+    apple: '/icons/icon-192.png',
+  },
   alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
@@ -76,7 +83,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-TW">
-      <body>{children}</body>
+      <body>
+        <DevSwCleanup />
+        {children}
+      </body>
     </html>
   );
 }

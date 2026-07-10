@@ -17,6 +17,7 @@ import { DangerWarningCard } from '@/components/mobile/DangerWarningCard';
 import { JourneyHUD } from '@/components/mobile/JourneyHUD';
 import { OfflineBadge } from '@/components/mobile/OfflineBadge';
 import { PhrasebookFAB } from '@/components/mobile/PhrasebookFAB';
+import { InstallSuggestionBanner } from '@/components/mobile/InstallSuggestionBanner';
 
 export default function HomePage() {
   return (
@@ -39,6 +40,7 @@ export default function HomePage() {
         <JourneyHUD />
         <POICard />
         <DangerWarningCard />
+        <InstallSuggestionBanner />
       </main>
       <BottomNavBar />
       <FilterModal />

@@ -6,6 +6,7 @@ import { Header } from '@/components/ui/Header';
 import { BottomNavBar } from '@/components/mobile/BottomNavBar';
 import { ActiveAlertsList } from '@/components/mobile/ActiveAlertsList';
 import { FooterLinks } from '@/components/ui/FooterLinks';
+import { InstallAppButton } from '@/components/ui/InstallAppButton';
 
 export default function ProfilePage() {
   return (
@@ -15,6 +16,10 @@ export default function ProfilePage() {
         <Suspense fallback={null}>
           <ActiveAlertsList />
         </Suspense>
+        {/* PWA 安裝（Phase 17A，v4.0 B4 永久位置：「我的」頁）；已安裝自動隱藏 */}
+        <div className="w-full">
+          <InstallAppButton />
+        </div>
         <Link
           href="/phrasebook"
           className="tap-target flex w-full items-center justify-between rounded-2xl bg-white p-4"
