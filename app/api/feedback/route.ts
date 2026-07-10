@@ -1,32 +1,15 @@
 // POST /api/feedback — 回饋意見提交（Phase 13，v1.0 §7.9/§十六）
 // 任何人可提交（無需登入）；後端完整驗證，不只靠前端。
-// 速率限制：暫用單機記憶體版（serverless 每實例各自計數，聊勝於無）；
-// Phase 18A 接上 @upstash/ratelimit 後取代。
+// 速率限制：Upstash 滑動視窗（Phase 18A，lib/rate-limit.ts）。
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase-server';
 import { sendAdminEmail, sendEmail } from '@/lib/send-email';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 const CATEGORIES = ['bug', 'suggestion', 'data_error', 'praise', 'other'] as const;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const APP_VERSION = '0.1.0';
-
-// 每 IP 10 分鐘最多 3 則
-const WINDOW_MS = 10 * 60_000;
-const MAX_PER_WINDOW = 3;
-const hits = new Map<string, number[]>();
-
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  const list = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
-  if (list.length >= MAX_PER_WINDOW) {
-    hits.set(ip, list);
-    return true;
-  }
-  list.push(now);
-  hits.set(ip, list);
-  return false;
-}
 
 export async function POST(req: NextRequest) {
   let body: Record<string, unknown>;
@@ -42,7 +25,8 @@ export async function POST(req: NextRequest) {
   }
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-  if (rateLimited(ip)) {
+  // 每 IP 10 分鐘最多 3 則（Phase 18A：Upstash 跨實例共享）
+  if (!(await checkRateLimit('feedback', ip))) {
     return NextResponse.json(
       { error: '提交太頻繁，請稍後再試 · Too many requests' },
       { status: 429 }

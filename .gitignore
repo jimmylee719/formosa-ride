@@ -45,3 +45,7 @@ backup-*.sql
 public/sw.js
 public/sw.js.map
 public/swe-worker*.js
+
+# 資料庫備份（本機保存，公開 repo 絕不提交）
+backups/
+.next-prod/

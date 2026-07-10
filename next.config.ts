@@ -21,6 +21,9 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // production 驗證可用獨立輸出目錄（NEXT_DIST_DIR=.next-prod），
+  // 避免 dev server 與 build 共用 .next 互相覆寫（本機實測多次踩雷）
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },

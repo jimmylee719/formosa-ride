@@ -1,0 +1,21 @@
+# Dependabot（Phase 18A）：每週檢查依賴安全更新
+# 小版本/修補集中成一個 PR，避免 PR 轟炸；major 個別開（需人工評估）。
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Taipei
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly

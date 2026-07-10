@@ -5,30 +5,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { createServiceClient } from '@/lib/supabase-server';
 import { ADMIN_COOKIE, ADMIN_SESSION_HOURS, signAdminToken } from '@/lib/admin-auth';
-
-// 登入嘗試限制：每 IP 15 分鐘 5 次（記憶體版，Phase 18A 換 Upstash）
-const WINDOW_MS = 15 * 60_000;
-const MAX_ATTEMPTS = 5;
-const attempts = new Map<string, number[]>();
+import { checkRateLimit } from '@/lib/rate-limit';
 
 // 供「帳號不存在」時空跑一次比對的假 hash（冷啟動時生成，非任何真密碼）
 const DUMMY_HASH = bcrypt.hashSync(`dummy-${Date.now()}`, 12);
 
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  const list = (attempts.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
-  if (list.length >= MAX_ATTEMPTS) {
-    attempts.set(ip, list);
-    return true;
-  }
-  list.push(now);
-  attempts.set(ip, list);
-  return false;
-}
-
 export async function POST(req: NextRequest) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-  if (rateLimited(ip)) {
+  // 登入嘗試限制：每 IP 15 分鐘 5 次（Phase 18A：Upstash 跨實例共享）
+  if (!(await checkRateLimit('login', ip))) {
     return NextResponse.json(
       { error: '嘗試次數過多，請 15 分鐘後再試' },
       { status: 429 }
