@@ -1,6 +1,7 @@
 // /admin/dashboard — 後台儀表板（Phase 14）
-// 系統核心數據總覽 + 最近匯入紀錄（Phase 14C，v10.0 C4）；警示橫幅於 Phase 14D 加入。
+// 系統核心數據總覽 + 最近匯入紀錄（Phase 14C，v10.0 C4）+ 偵錯警示橫幅（Phase 14D，v11.0 B3）。
 import { createServiceClient } from '@/lib/supabase-server';
+import { AlertsBanner } from '@/components/admin/AlertsBanner';
 
 interface ImportHistoryRow {
   id: string;
@@ -68,6 +69,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <>
+      <AlertsBanner />
       <h1 className="text-xl font-bold">📊 儀表板</h1>
       <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-5">
         {stats.map((s) => (
