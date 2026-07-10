@@ -16,6 +16,7 @@ import { DangerZoneLayer } from '@/components/map/DangerZoneLayer';
 import { DangerWarningCard } from '@/components/mobile/DangerWarningCard';
 import { JourneyHUD } from '@/components/mobile/JourneyHUD';
 import { OfflineBadge } from '@/components/mobile/OfflineBadge';
+import { PhrasebookFAB } from '@/components/mobile/PhrasebookFAB';
 
 export default function HomePage() {
   return (
@@ -32,6 +33,7 @@ export default function HomePage() {
         <NightWarningLayer />
         <DangerZoneLayer />
         <MapFAB />
+        <PhrasebookFAB />
         <OfflineBadge />
         <BannerQueue />
         <JourneyHUD />

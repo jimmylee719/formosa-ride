@@ -15,10 +15,17 @@ export default function ProfilePage() {
           <ActiveAlertsList />
         </Suspense>
         <Link
+          href="/phrasebook"
+          className="tap-target flex w-full items-center justify-between rounded-2xl bg-white p-4"
+        >
+          <span className="info-primary font-bold">💬 溝通小卡 Phrasebook</span>
+          <span aria-hidden>›</span>
+        </Link>
+        <Link
           href="/feedback"
           className="tap-target flex w-full items-center justify-between rounded-2xl bg-white p-4"
         >
-          <span className="info-primary font-bold">💬 回饋意見 Feedback</span>
+          <span className="info-primary font-bold">📨 回饋意見 Feedback</span>
           <span aria-hidden>›</span>
         </Link>
         <div className="flex w-full flex-col items-center gap-2 rounded-2xl bg-white p-8 text-center">
