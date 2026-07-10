@@ -227,6 +227,11 @@ export default function AdminImportPage() {
       {phase === 'done' && (
         <section className="mt-3 rounded-2xl bg-safe-bg p-4">
           <h2 className="font-bold text-safe-text">✅ 匯入完成：{imported} 筆</h2>
+          {type === 'route' && imported > 0 && (
+            <p className="mt-1 text-sm text-safe-text">
+              ⏳ 海拔剖面背景計算中…（完成後使用者開啟頁面即可直接看到，不需等待）
+            </p>
+          )}
           {corrections && (
             <ul className="mt-2 max-h-60 overflow-y-auto rounded-lg bg-white p-3 text-sm">
               {corrections.map((c, i) => (

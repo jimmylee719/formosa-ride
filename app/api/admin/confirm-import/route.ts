@@ -1,7 +1,9 @@
 // POST /api/admin/confirm-import — 確認匯入（Phase 14A，v4.0 C7）
 // 收前端送回的驗證結果，逐欄白名單重建 + 複驗後寫庫，並記錄 import_history。
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from 'next/server';
 import { createServiceClient } from '@/lib/supabase-server';
+import { precomputeElevationForRoute } from '@/lib/elevation';
 import { ADMIN_COOKIE, verifyAdminToken } from '@/lib/admin-auth';
 import {
   POI_TYPE_MAP,
@@ -220,11 +222,25 @@ export async function POST(req: NextRequest) {
     const records = rawRecords.map(rebuildRoute).filter((x): x is RouteRecord => x !== null);
     rejected = rawRecords.length - records.length;
     if (records.length > 0) {
-      const { error } = await supabase
+      const { data: inserted, error } = await supabase
         .from('routes')
-        .upsert(records, { onConflict: 'slug' });
+        .upsert(records, { onConflict: 'slug' })
+        .select('id');
       if (error) dbError = error.message;
-      else imported = records.length;
+      else {
+        imported = records.length;
+        // 海拔剖面背景預先計算（Phase 15C，v9.0 B2）：回應先送出，計算不讓管理員等
+        const ids = (inserted ?? []).map((r) => r.id as string);
+        after(async () => {
+          for (const routeId of ids) {
+            try {
+              await precomputeElevationForRoute(routeId);
+            } catch (err) {
+              console.error(`[confirm-import] 路線 ${routeId} 海拔預先計算失敗:`, err);
+            }
+          }
+        });
+      }
     }
   } else {
     const records = rawRecords
