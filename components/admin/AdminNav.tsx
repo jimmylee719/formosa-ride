@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 const NAV = [
   { href: '/admin/dashboard', label: '📊 儀表板' },
+  { href: '/admin/import', label: '📤 批次上傳' },
   { href: '/admin/feedback', label: '📨 回饋意見' },
   { href: '/admin/settings', label: '⚙️ 帳號設定' },
 ] as const;
