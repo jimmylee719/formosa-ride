@@ -76,14 +76,70 @@ export const viewport: Viewport = {
   themeColor: '#16A34A',
 };
 
+// JSON-LD 結構化資料（Phase 18B，v11.0 C3）：讓 Google 讀懂這是旅遊工具
+// 註：規格中的 offers（USD$10）待 Phase 9A 付款開放後再加入——
+//     不對搜尋引擎宣告目前買不到的商品。
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      '@id': `${SITE_URL}/#app`,
+      name: 'FormoSA Ride 環島通',
+      description: 'Digital guide for cycling around Taiwan',
+      url: SITE_URL,
+      applicationCategory: 'TravelApplication',
+      operatingSystem: 'Web, iOS, Android (PWA)',
+      featureList: [
+        'Cycling Route No.1 Taiwan interactive map',
+        'Real-time danger zone alerts',
+        'Sunset/sunrise warnings',
+        'Offline map support',
+        'POI: campsites, repair shops, convenience stores',
+        'GPS trip recording',
+        'Multi-language: Chinese & English',
+      ],
+    },
+    {
+      '@type': 'TouristAttraction',
+      '@id': `${SITE_URL}/#route`,
+      name: 'Taiwan Cycling Route No.1',
+      description: 'The official 960.8km cycling route around Taiwan island',
+      touristType: ['Cyclist', 'Backpacker', 'Solo Traveller'],
+      geo: {
+        '@type': 'GeoShape',
+        description: 'Circumnavigating Taiwan island by bicycle',
+      },
+    },
+    {
+      '@type': 'Organization',
+      name: 'Camper Road Taiwan 露途臺灣',
+      url: SITE_URL,
+      email: 'skadoosh.ai.lab@gmail.com',
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        email: 'skadoosh.ai.lab@gmail.com',
+        availableLanguage: ['Chinese', 'English'],
+      },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-TW">
+    // 英文為主（2026-07-10 指示）：主要語言標記與 OG locale 一致
+    <html lang="en">
       <body>
+        <script
+          type="application/ld+json"
+          // JSON-LD 為自家常數序列化，無使用者輸入
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <DevSwCleanup />
         {children}
       </body>
