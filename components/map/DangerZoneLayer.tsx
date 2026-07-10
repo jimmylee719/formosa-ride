@@ -9,6 +9,7 @@ import type { LineStringGeoJSON } from '@/types/route';
 
 const DANGER_SOURCE = 'danger-zones';
 const DANGER_LAYER = 'danger-zones-line';
+const DANGER_POINT_LAYER = 'danger-zones-point'; // Phase 15：事故熱點（Point 幾何）
 const RESTRICTED_SOURCE = 'restricted-roads';
 const RESTRICTED_LAYER = 'restricted-roads-line';
 const MIN_ZOOM = 7;
@@ -18,10 +19,14 @@ interface DangerFeature {
   name_zh: string;
   name_en: string | null;
   level: 'high' | 'medium' | 'low';
-  geometry: LineStringGeoJSON;
+  geometry: LineStringGeoJSON | { type: 'Point'; coordinates: [number, number] };
   reason_zh: string | null;
   reason_en: string | null;
   is_night_only: boolean;
+  /** Phase 15（migration 0015 後 RPC 才回傳，先前為 undefined） */
+  accident_count?: number | null;
+  accident_source?: string | null;
+  data_year?: number | null;
 }
 
 interface RestrictedRoad {
@@ -88,6 +93,7 @@ export function DangerZoneLayer() {
         id: DANGER_LAYER,
         type: 'line',
         source: DANGER_SOURCE,
+        filter: ['!=', ['geometry-type'], 'Point'],
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
           'line-color': [
@@ -101,17 +107,46 @@ export function DangerZoneLayer() {
           'line-opacity': 0.7,
         },
       });
+      // 事故熱點（Point）：圓點標示，顏色語言與線段一致（Phase 15）
+      map.addLayer({
+        id: DANGER_POINT_LAYER,
+        type: 'circle',
+        source: DANGER_SOURCE,
+        filter: ['==', ['geometry-type'], 'Point'],
+        paint: {
+          'circle-color': [
+            'match',
+            ['get', 'level'],
+            'high', '#DC2626',
+            'medium', '#D97706',
+            '#CA8A04',
+          ],
+          'circle-radius': ['match', ['get', 'level'], 'high', 9, 'medium', 7, 6],
+          'circle-opacity': 0.45,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': [
+            'match',
+            ['get', 'level'],
+            'high', '#DC2626',
+            'medium', '#D97706',
+            '#CA8A04',
+          ],
+        },
+      });
     };
 
+    let fetchSeq = 0; // 亂序回應防護：僅最後一次請求的結果可寫入 source
     const upsertDangerSource = async () => {
       if (map.getZoom() < MIN_ZOOM) return;
+      const seq = ++fetchSeq;
       const b = map.getBounds();
       try {
         const res = await fetch(
           `/api/danger-zones?bbox=${b.getWest().toFixed(4)},${b.getSouth().toFixed(4)},${b.getEast().toFixed(4)},${b.getNorth().toFixed(4)}&night_mode=${isNightMode}`
         );
-        if (!res.ok || disposed) return;
+        if (!res.ok || disposed || seq !== fetchSeq) return;
         const { features } = (await res.json()) as { features: DangerFeature[] };
+        if (seq !== fetchSeq) return;
         const fc = {
           type: 'FeatureCollection' as const,
           features: features.map((f) => ({
@@ -123,6 +158,9 @@ export function DangerZoneLayer() {
               level: f.level,
               reason_zh: f.reason_zh ?? '',
               reason_en: f.reason_en ?? '',
+              accident_count: f.accident_count ?? null,
+              accident_source: f.accident_source ?? '',
+              data_year: f.data_year ?? null,
             },
           })),
         };
@@ -141,18 +179,18 @@ export function DangerZoneLayer() {
     const onClickDanger = (
       e: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] }
     ) => {
-      const p = e.features?.[0]?.properties as Record<string, string> | undefined;
+      const p = e.features?.[0]?.properties as Record<string, unknown> | undefined;
       if (!p) return;
       setSelectedDanger({
         kind: 'danger',
         level: (p.level as SelectedDanger['level']) ?? 'medium',
-        name_zh: p.name_zh ?? '',
-        name_en: p.name_en || null,
-        reason_zh: p.reason_zh || null,
-        reason_en: p.reason_en || null,
-        accident_count: null,
-        accident_source: null,
-        data_year: null,
+        name_zh: String(p.name_zh ?? ''),
+        name_en: (p.name_en as string) || null,
+        reason_zh: (p.reason_zh as string) || null,
+        reason_en: (p.reason_en as string) || null,
+        accident_count: typeof p.accident_count === 'number' ? p.accident_count : null,
+        accident_source: (p.accident_source as string) || null,
+        data_year: typeof p.data_year === 'number' ? p.data_year : null,
         road_number: null,
         law_basis: null,
       });
@@ -203,6 +241,7 @@ export function DangerZoneLayer() {
     void setupAll();
     map.on('moveend', upsertDangerSource);
     map.on('click', DANGER_LAYER, onClickDanger);
+    map.on('click', DANGER_POINT_LAYER, onClickDanger);
     map.on('click', RESTRICTED_LAYER, onClickRestricted);
 
     // 高風險閃爍：每 2 秒 opacity 0.4 ↔ 0.8（v3.0 A4）
@@ -225,8 +264,9 @@ export function DangerZoneLayer() {
       try {
         map.off('moveend', upsertDangerSource);
         map.off('click', DANGER_LAYER, onClickDanger);
+        map.off('click', DANGER_POINT_LAYER, onClickDanger);
         map.off('click', RESTRICTED_LAYER, onClickRestricted);
-        for (const layer of [DANGER_LAYER, RESTRICTED_LAYER]) {
+        for (const layer of [DANGER_LAYER, DANGER_POINT_LAYER, RESTRICTED_LAYER]) {
           if (map.getLayer(layer)) map.removeLayer(layer);
         }
         for (const src of [DANGER_SOURCE, RESTRICTED_SOURCE]) {
