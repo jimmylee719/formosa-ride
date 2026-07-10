@@ -66,3 +66,17 @@ button {
     cursor: pointer;
   }
 }
+
+/* 行前備用卡列印樣式（Phase 16B，v7.0 D3） */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-card {
+    font-size: 12pt;
+    color: black;
+  }
+  body {
+    background: white;
+  }
+}

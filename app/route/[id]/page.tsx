@@ -142,6 +142,14 @@ export default async function RouteDetailPage({
           🗺️ View on main map · 在主地圖檢視
         </Link>
 
+        {/* 行前備用卡（Phase 16B）：紙本備援，手機沒電/沒訊號的最後防線 */}
+        <Link
+          href={`/route/${route.id}/print-card`}
+          className="tap-target mt-2 flex items-center justify-center rounded-xl border border-neutral-border bg-white py-3 font-bold"
+        >
+          🖨️ Pre-trip backup card · 行前備用卡
+        </Link>
+
         {/* 離線下載包（Phase 11B） */}
         <OfflineDownloadButton routeId={route.id} />
 
