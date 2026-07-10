@@ -2,6 +2,7 @@
 import { Header } from '@/components/ui/Header';
 import { BottomNavBar } from '@/components/mobile/BottomNavBar';
 import { FeedbackForm } from '@/components/feedback/FeedbackForm';
+import { FooterLinks } from '@/components/ui/FooterLinks';
 
 export const metadata = {
   title: '回饋意見 Feedback | FormoSA Ride 環島通',
@@ -21,6 +22,7 @@ export default function FeedbackPage() {
         <div className="mt-4 rounded-2xl bg-white p-4">
           <FeedbackForm />
         </div>
+        <FooterLinks />
       </main>
       <BottomNavBar />
     </div>

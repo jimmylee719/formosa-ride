@@ -2,6 +2,7 @@
 import { Header } from '@/components/ui/Header';
 import { BottomNavBar } from '@/components/mobile/BottomNavBar';
 import { RouteCard } from '@/components/route/RouteCard';
+import { FooterLinks } from '@/components/ui/FooterLinks';
 import { listRoutes } from '@/lib/route-queries';
 import type { RouteListItem } from '@/types/route';
 
@@ -66,6 +67,7 @@ export default async function RoutesPage() {
             );
           })
         )}
+        <FooterLinks />
       </main>
       <BottomNavBar />
     </div>

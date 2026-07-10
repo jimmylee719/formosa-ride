@@ -212,6 +212,14 @@ export default function EmergencyPage() {
           </ul>
         </section>
 
+        {/* 政府資源（v5.0 D2：緊急頁也放，旅客有需要時容易找到） */}
+        <a
+          href="/resources"
+          className="tap-target mt-3 flex w-full items-center justify-center rounded-xl border border-neutral-border bg-white py-3 font-bold"
+        >
+          🏛️ Official Gov Resources 政府觀光資源
+        </a>
+
         <p className="info-secondary mt-4 pb-4 text-center text-neutral-text">
           本頁資訊定期更新。若需進一步協助：
           <br />

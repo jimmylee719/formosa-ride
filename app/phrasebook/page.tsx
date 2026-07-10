@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Header } from '@/components/ui/Header';
 import { BottomNavBar } from '@/components/mobile/BottomNavBar';
 import { PHRASEBOOK, type Phrase } from '@/lib/phrasebook-data';
+import { FooterLinks } from '@/components/ui/FooterLinks';
 import { canSpeak, speakChinese } from '@/lib/text-to-speech';
 
 export default function PhrasebookPage() {
@@ -77,9 +78,10 @@ export default function PhrasebookPage() {
           </section>
         ))}
 
-        <p className="info-secondary mt-6 pb-4 text-center text-neutral-text">
-          本頁離線也能開啟 · Works offline
+        <p className="info-secondary mt-6 text-center text-neutral-text">
+          Works offline · 本頁離線也能開啟
         </p>
+        <FooterLinks />
       </main>
       <BottomNavBar />
 

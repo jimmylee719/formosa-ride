@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Header } from '@/components/ui/Header';
 import { BottomNavBar } from '@/components/mobile/BottomNavBar';
 import { ActiveAlertsList } from '@/components/mobile/ActiveAlertsList';
+import { FooterLinks } from '@/components/ui/FooterLinks';
 
 export default function ProfilePage() {
   return (
@@ -39,6 +40,7 @@ export default function ProfilePage() {
             會員功能建置中（Phase 9）
           </p>
         </div>
+        <FooterLinks />
       </main>
       <BottomNavBar />
     </div>
