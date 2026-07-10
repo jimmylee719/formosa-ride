@@ -1,0 +1,29 @@
+{
+  "name": "FormoSA Ride — Taiwan Cycling Tour Guide 環島通",
+  "short_name": "FormoSA Ride",
+  "description": "Taiwan cycling tour guide: routes, supplies, weather, safety. 台灣自行車環島完整資訊平台。",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#16A34A",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

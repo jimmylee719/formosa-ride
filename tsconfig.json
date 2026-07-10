@@ -3,7 +3,12 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
+      "webworker"
+    ],
+    "types": [
+      "@serwist/next/typings",
+      "node"
     ],
     "allowJs": true,
     "skipLibCheck": true,

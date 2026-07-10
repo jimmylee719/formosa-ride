@@ -40,3 +40,8 @@ yarn-error.log*
 
 # 資料庫備份檔（由 GitHub Actions 備份至獨立私有倉庫，不混入主 repo）
 backup-*.sql
+
+# Serwist 產物（build 時生成）
+public/sw.js
+public/sw.js.map
+public/swe-worker*.js
