@@ -21,7 +21,7 @@
     "jose": "^6.2.3",
     "lucide-react": "^1.23.0",
     "maplibre-gl": "^5.24.0",
-    "next": "^15.5.20",
+    "next": "^16.2.10",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "server-only": "^0.0.1",
