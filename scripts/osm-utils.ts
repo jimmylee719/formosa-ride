@@ -92,3 +92,66 @@ export function chainKm(chain: Coord[]): number {
   }
   return km;
 }
+
+/** 消耗式縫合：把 ways 分解成多條互相連通的子鏈（Phase 15A，處理大型路線關聯） */
+export function decomposeChains(ways: Coord[][], tolKm = 0.15): Coord[][] {
+  const pool = ways.filter((w) => w.length >= 2).map((w) => [...w]);
+  const chains: Coord[][] = [];
+  while (pool.length) {
+    pool.sort((a, b) => b.length - a.length);
+    let chain = pool.shift()!;
+    let extended = true;
+    while (extended) {
+      extended = false;
+      for (let i = 0; i < pool.length; i++) {
+        const w = pool[i]!;
+        const cs = chain[0]!;
+        const ce = chain[chain.length - 1]!;
+        const ws = w[0]!;
+        const we = w[w.length - 1]!;
+        if (distKm(ce, ws) <= tolKm) chain = chain.concat(w);
+        else if (distKm(ce, we) <= tolKm) chain = chain.concat([...w].reverse());
+        else if (distKm(cs, we) <= tolKm) chain = w.concat(chain);
+        else if (distKm(cs, ws) <= tolKm) chain = [...w].reverse().concat(chain);
+        else continue;
+        pool.splice(i, 1);
+        extended = true;
+        break;
+      }
+    }
+    chains.push(chain);
+  }
+  return chains;
+}
+
+/** 主要子鏈（≥minKm）就近排序串接成單一路線；碎片（圓環/岔口小段）捨棄 */
+export function joinMajorChains(ways: Coord[][], minKm = 2): Coord[] {
+  const chains = decomposeChains(ways).filter((c) => chainKm(c) >= minKm);
+  if (chains.length === 0) return decomposeChains(ways).sort((a, b) => chainKm(b) - chainKm(a))[0] ?? [];
+  chains.sort((a, b) => chainKm(b) - chainKm(a));
+  let route = chains.shift()!;
+  while (chains.length) {
+    const re = route[route.length - 1]!;
+    let best = 0;
+    let bestD = Infinity;
+    let flip = false;
+    for (let i = 0; i < chains.length; i++) {
+      const c = chains[i]!;
+      const d1 = distKm(re, c[0]!);
+      const d2 = distKm(re, c[c.length - 1]!);
+      if (d1 < bestD) {
+        bestD = d1;
+        best = i;
+        flip = false;
+      }
+      if (d2 < bestD) {
+        bestD = d2;
+        best = i;
+        flip = true;
+      }
+    }
+    const next = chains.splice(best, 1)[0]!;
+    route = route.concat(flip ? [...next].reverse() : next);
+  }
+  return route;
+}

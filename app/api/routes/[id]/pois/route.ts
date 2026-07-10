@@ -20,6 +20,18 @@ export async function GET(
   const types = typesParam ? typesParam.split(',').filter(Boolean) : null;
 
   const supabase = createAnonServerClient();
+  // 超長路線（>150km）緩衝查詢會逾時且結果數千筆，直接回空集合＋標記（Phase 15A）
+  const { data: routeRow } = await supabase
+    .from('routes')
+    .select('distance_km')
+    .eq('id', id)
+    .maybeSingle();
+  if (routeRow && Number(routeRow.distance_km) > 150) {
+    return NextResponse.json(
+      { pois: [], too_long: true },
+      { headers: { 'Cache-Control': 'public, max-age=600' } }
+    );
+  }
   const { data, error } = await supabase.rpc('get_pois_along_route', {
     p_route_id: id,
     p_buffer_km: buffer,

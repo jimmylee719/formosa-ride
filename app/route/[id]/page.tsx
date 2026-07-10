@@ -50,14 +50,20 @@ export default async function RouteDetailPage({
   if (!route) notFound();
 
   // 沿線 POI（3km 緩衝，v1.0 §7.4）
-  const supabase = createAnonServerClient();
-  const { data: alongPois } = await supabase.rpc('get_pois_along_route', {
-    p_route_id: id,
-    p_buffer_km: 3,
-    p_types: null,
-    p_free_tier_only: false,
-  });
-  const pois = (alongPois ?? []) as AlongPoi[];
+  // 超長路線（>150km，如環島1號線 939km）緩衝查詢會逾時且結果達數千筆無閱讀價值，
+  // 改引導使用者在主地圖沿途查看（Phase 15A）
+  const tooLongForAlongPois = Number(route.distance_km) > 150;
+  let pois: AlongPoi[] = [];
+  if (!tooLongForAlongPois) {
+    const supabase = createAnonServerClient();
+    const { data: alongPois } = await supabase.rpc('get_pois_along_route', {
+      p_route_id: id,
+      p_buffer_km: 3,
+      p_types: null,
+      p_free_tier_only: false,
+    });
+    pois = (alongPois ?? []) as AlongPoi[];
+  }
 
   const typeLabel = ROUTE_TYPE_LABELS[route.type];
   const diff = DIFFICULTY_LABELS[route.difficulty];
@@ -156,7 +162,13 @@ export default async function RouteDetailPage({
           <h2 className="info-primary font-bold">
             📍 沿線地點（3km 內）· Along the route
           </h2>
-          {pois.length === 0 ? (
+          {tooLongForAlongPois ? (
+            <p className="info-secondary mt-1 text-neutral-text">
+              Long route — open the main map to browse places along the way
+              <br />
+              長程路線，請點「在主地圖檢視」沿途查看地點
+            </p>
+          ) : pois.length === 0 ? (
             <p className="info-secondary mt-1 text-neutral-text">
               尚無沿線地點資料 · No POI data yet
             </p>
