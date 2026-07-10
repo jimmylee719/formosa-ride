@@ -4,6 +4,7 @@
 import Link from 'next/link';
 
 const LINKS = [
+  { href: '/guide', label: 'How to Use 使用說明' },
   { href: '/privacy', label: 'Privacy 隱私政策' },
   { href: '/resources', label: 'Gov Resources 政府資源' },
   { href: '/feedback', label: 'Feedback 回饋意見' },
