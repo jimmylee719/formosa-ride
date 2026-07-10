@@ -9,7 +9,7 @@ export function PhrasebookFAB() {
       href="/phrasebook"
       className="tap-target absolute bottom-16 left-3 z-10 flex items-center gap-1 rounded-full bg-white px-4 py-2 font-bold shadow-md"
     >
-      💬 溝通小卡
+      💬 Phrasebook 溝通小卡
     </Link>
   );
 }

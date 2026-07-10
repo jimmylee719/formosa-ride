@@ -57,7 +57,7 @@ export default function EmergencyPage() {
       <Header />
       <main className="flex-1 overflow-y-auto bg-neutral-bg p-4">
         <h1 className="alert-warning text-neutral-text">
-          🆘 緊急安全資訊 Emergency &amp; Safety
+          🆘 Emergency &amp; Safety 緊急安全資訊
         </h1>
 
         {/* 區塊 1：緊急撥號（大按鈕，警示文字 ≥22px） */}
@@ -69,7 +69,7 @@ export default function EmergencyPage() {
             <span className="text-3xl" aria-hidden>
               🚑
             </span>
-            <span className="alert-warning">撥打 119 救護車 Ambulance</span>
+            <span className="alert-warning">Call 119 Ambulance 救護車</span>
           </a>
           <a
             href="tel:110"
@@ -78,17 +78,17 @@ export default function EmergencyPage() {
             <span className="text-3xl" aria-hidden>
               🚔
             </span>
-            <span className="alert-warning">撥打 110 報警 Police</span>
+            <span className="alert-warning">Call 110 Police 報警</span>
           </a>
         </div>
 
         {/* 區塊 2：24 小時旅遊諮詢熱線 */}
         <section className="mt-4 rounded-2xl bg-white p-4">
-          <h2 className="info-primary font-bold">🌏 24 小時旅遊諮詢熱線</h2>
+          <h2 className="info-primary font-bold">🌏 24-Hour Tourist Hotline 旅遊諮詢熱線</h2>
           <p className="info-secondary mt-1 text-neutral-text">
-            免付費 · 24 小時 · 中/英/日語服務
+            Toll-free · 24hr · CN/EN/JP service
             <br />
-            Toll-free tourist hotline (24hr, CN/EN/JP)
+            免付費 · 24 小時 · 中/英/日語服務
           </p>
           <a
             href="tel:0800011765"
@@ -100,7 +100,7 @@ export default function EmergencyPage() {
 
         {/* 目前位置（v11.0 A9）：報案/求援時直接唸出或傳送 */}
         <section className="mt-3 rounded-2xl bg-white p-4">
-          <h2 className="info-primary font-bold">📍 目前位置 Your Location</h2>
+          <h2 className="info-primary font-bold">📍 Your Location 目前位置</h2>
           {geo.status === 'loading' && (
             <p className="info-secondary mt-1 text-neutral-text">
               ⏳ 定位中… Locating…
@@ -138,13 +138,13 @@ export default function EmergencyPage() {
           onClick={handleFindHospital}
           className="tap-target mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 font-bold text-white shadow"
         >
-          🏥 查詢附近醫院 Find nearby hospitals
+          🏥 Find Nearby Hospitals 查詢附近醫院
         </button>
 
         {/* 區塊 3：腳踏車事故處理步驟 */}
         <section className="mt-3 rounded-2xl bg-white p-4">
           <h2 className="info-primary font-bold">
-            🚴 事故處理步驟 · Accident Steps
+            🚴 Accident Steps · 事故處理步驟
           </h2>
           <ol className="info-secondary mt-2 list-decimal space-y-2 pl-5 text-neutral-text">
             <li>
@@ -178,7 +178,7 @@ export default function EmergencyPage() {
         {/* 區塊 4：常用急救資訊 — 熱衰竭/中暑（v11.0 A9 詳版取代 v1.0 一行版） */}
         <section className="mt-3 rounded-2xl bg-caution-bg p-4">
           <h2 className="info-primary font-bold text-caution-text">
-            ⚕️ 熱衰竭/中暑急救 · Heatstroke First Aid
+            ⚕️ Heatstroke First Aid · 熱衰竭/中暑急救
           </h2>
           <ol className="info-secondary mt-2 list-decimal space-y-2 pl-5 text-caution-text">
             <li>移到陰涼通風處 Move to cool shade</li>
@@ -195,7 +195,7 @@ export default function EmergencyPage() {
         </section>
 
         <section className="mt-3 rounded-2xl bg-white p-4">
-          <h2 className="info-primary font-bold">🔧 其他常見狀況 · Other</h2>
+          <h2 className="info-primary font-bold">🔧 Other Situations · 其他常見狀況</h2>
           <ul className="info-secondary mt-2 space-y-2 text-neutral-text">
             <li>
               <strong>爆胎 Flat tire：</strong>

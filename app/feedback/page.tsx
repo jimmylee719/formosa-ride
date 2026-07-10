@@ -12,11 +12,11 @@ export default function FeedbackPage() {
     <div className="flex h-dvh flex-col overflow-hidden">
       <Header />
       <main className="flex-1 overflow-y-auto bg-neutral-bg p-4">
-        <h1 className="alert-warning text-neutral-text">💬 回饋意見 Feedback</h1>
+        <h1 className="alert-warning text-neutral-text">📨 Feedback 回饋意見</h1>
         <p className="info-secondary mt-1 text-neutral-text">
-          發現問題或有建議嗎？告訴我們，讓環島通更好用。
-          <br />
           Found a bug or have a suggestion? Let us know!
+          <br />
+          發現問題或有建議嗎？告訴我們，讓環島通更好用。
         </p>
         <div className="mt-4 rounded-2xl bg-white p-4">
           <FeedbackForm />

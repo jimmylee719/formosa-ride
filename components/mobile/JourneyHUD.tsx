@@ -216,7 +216,7 @@ export function JourneyHUD() {
         disabled={busy}
         className="tap-target absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full bg-primary px-6 py-3 font-bold text-white shadow-lg disabled:opacity-50"
       >
-        🚴 開始今天的旅途 · Start Journey
+        🚴 Start Journey · 開始今天的旅途
       </button>
     );
   }
@@ -242,7 +242,7 @@ export function JourneyHUD() {
           className="tap-target flex w-full items-center justify-between px-4 py-2"
         >
           <span className="info-secondary font-bold">
-            {stats.isResting ? '😴 休息中 Resting' : '🟢 旅途進行中'}
+            {stats.isResting ? '😴 Resting 休息中' : '🟢 Riding 旅途中'}
           </span>
           <span className="info-primary font-bold">
             🚴 {stats.currentSpeedKmh} km/h · 📏 {stats.totalDistanceKm} km
@@ -257,7 +257,7 @@ export function JourneyHUD() {
                 <p className="text-xl font-bold text-primary">
                   {Math.floor(stats.ridingMinutes / 60)}:{String(stats.ridingMinutes % 60).padStart(2, '0')}
                 </p>
-                <p className="text-sm text-neutral-text">騎乘 riding</p>
+                <p className="text-sm text-neutral-text">riding 騎乘</p>
               </div>
               <div>
                 <p className="text-xl font-bold text-accent">{stats.calories}</p>
@@ -265,13 +265,13 @@ export function JourneyHUD() {
               </div>
               <div>
                 <p className="text-xl font-bold text-info-border">{stats.restMinutes}</p>
-                <p className="text-sm text-neutral-text">休息 min</p>
+                <p className="text-sm text-neutral-text">rest 休息 min</p>
               </div>
             </div>
 
             {aheadPois.length > 0 && (
               <div className="mt-3">
-                <p className="info-secondary font-bold">── 前方資訊 Ahead ──</p>
+                <p className="info-secondary font-bold">── Ahead 前方資訊 ──</p>
                 <ul className="mt-1">
                   {aheadPois.map((p) => (
                     <li key={p.id} className="flex items-center gap-2 py-1">
@@ -295,7 +295,7 @@ export function JourneyHUD() {
                 disabled={busy}
                 className="tap-target flex-1 rounded-xl border border-neutral-border py-3 font-bold disabled:opacity-50"
               >
-                📍 分享位置
+                📍 Share 分享
               </button>
               <button
                 type="button"
@@ -303,7 +303,7 @@ export function JourneyHUD() {
                 disabled={busy}
                 className="tap-target flex-1 rounded-xl border border-neutral-border py-3 font-bold disabled:opacity-50"
               >
-                📌 標記
+                📌 Mark 標記
               </button>
               <button
                 type="button"
@@ -311,7 +311,7 @@ export function JourneyHUD() {
                 disabled={busy}
                 className="tap-target flex-1 rounded-xl bg-danger-border py-3 font-bold text-white disabled:opacity-50"
               >
-                🏁 結束今天
+                🏁 End Day 結束
               </button>
             </div>
             {shareOpen && (

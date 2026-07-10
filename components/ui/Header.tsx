@@ -6,7 +6,7 @@ import { WeatherWidget } from '@/components/weather/WeatherWidget';
 export function Header() {
   return (
     <header className="flex h-12 shrink-0 items-center justify-between border-b border-neutral-border bg-white px-3">
-      <span className="text-lg font-bold text-primary">🚴 環島通</span>
+      <span className="text-lg font-bold text-primary">🚴 FormoSA Ride</span>
       <div className="flex items-center gap-2">
         <WeatherWidget />
         <SolarWidget />

@@ -18,25 +18,25 @@ export default function ProfilePage() {
           href="/phrasebook"
           className="tap-target flex w-full items-center justify-between rounded-2xl bg-white p-4"
         >
-          <span className="info-primary font-bold">💬 溝通小卡 Phrasebook</span>
+          <span className="info-primary font-bold">💬 Phrasebook 溝通小卡</span>
           <span aria-hidden>›</span>
         </Link>
         <Link
           href="/feedback"
           className="tap-target flex w-full items-center justify-between rounded-2xl bg-white p-4"
         >
-          <span className="info-primary font-bold">📨 回饋意見 Feedback</span>
+          <span className="info-primary font-bold">📨 Feedback 回饋意見</span>
           <span aria-hidden>›</span>
         </Link>
         <div className="flex w-full flex-col items-center gap-2 rounded-2xl bg-white p-8 text-center">
           <p className="text-4xl" aria-hidden>
             🚧
           </p>
-          <h1 className="alert-warning">我的</h1>
+          <h1 className="alert-warning">My Account 我的</h1>
           <p className="info-secondary">
-            My Account
+            Member features coming soon
             <br />
-            會員功能建置中（Phase 9）· Coming soon
+            會員功能建置中（Phase 9）
           </p>
         </div>
       </main>

@@ -69,7 +69,7 @@ export default function CalculatorPage() {
       <Header />
       <main className="flex-1 overflow-y-auto bg-neutral-bg p-4">
         <h1 className="info-primary mb-3 font-bold">
-          🔥 卡路里計算 · Calorie Calculator
+          🔥 Calorie Calculator · 卡路里計算
         </h1>
 
         <div className="rounded-2xl bg-white p-4">

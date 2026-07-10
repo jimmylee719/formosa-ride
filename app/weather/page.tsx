@@ -58,7 +58,7 @@ function WeatherContent() {
   return (
     <main className="flex-1 overflow-y-auto bg-neutral-bg p-4">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="info-primary font-bold">🌤️ 天氣 · Weather</h1>
+        <h1 className="info-primary font-bold">🌤️ Weather · 天氣</h1>
         <select
           value={county}
           onChange={(e) => setCounty(e.target.value)}

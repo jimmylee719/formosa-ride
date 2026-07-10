@@ -25,18 +25,18 @@ export default function PhrasebookPage() {
       <Header />
       <main className="flex-1 overflow-y-auto bg-neutral-bg p-4">
         <h1 className="alert-warning text-neutral-text">
-          💬 溝通小卡 Phrasebook
+          💬 Phrasebook 溝通小卡
         </h1>
         <p className="info-secondary mt-1 text-neutral-text">
-          點卡片放大，直接拿給對方看；🔊 可播放中文發音。
+          Tap a card to enlarge and show it to locals; 🔊 plays Chinese audio.
           <br />
-          Tap a card to enlarge and show it to locals.
+          點卡片放大直接拿給對方看；🔊 可播放中文發音。
         </p>
 
         {PHRASEBOOK.map((cat) => (
           <section key={cat.id} className="mt-4">
             <h2 className="info-primary font-bold">
-              {cat.icon} {cat.title_zh} · {cat.title_en}
+              {cat.icon} {cat.title_en} · {cat.title_zh}
             </h2>
             <ul className="mt-2 flex flex-col gap-2">
               {cat.phrases.map((p) => (

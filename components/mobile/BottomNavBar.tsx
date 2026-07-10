@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
+// 英文為主（2026-07-10 指示）；zh 併列於同行小字
 const LEFT_ITEMS = [
   { href: '/', icon: '🗺️', label_zh: '地圖', label_en: 'Map' },
   { href: '/routes', icon: '🛤️', label_zh: '路線', label_en: 'Routes' },
@@ -67,7 +68,9 @@ export function BottomNavBar() {
         <span className="text-xl leading-none" aria-hidden>
           {item.icon}
         </span>
-        <span className="text-xs leading-none">{item.label_zh}</span>
+        <span className="text-[10px] leading-none">
+          {item.label_en} {item.label_zh}
+        </span>
       </Link>
     );
   };
