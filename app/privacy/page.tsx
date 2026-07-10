@@ -145,6 +145,8 @@ export default function PrivacyPage() {
           <p className="mt-1 text-neutral-text">
             露途臺灣 Camper Road Taiwan
             <br />
+            桃園市，台灣 Taoyuan City, Taiwan
+            <br />
             Email：
             <a href={`mailto:${CONTACT}`} className="underline">
               {CONTACT}

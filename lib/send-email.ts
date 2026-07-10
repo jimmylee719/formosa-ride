@@ -5,7 +5,11 @@
 
 const ADMIN_EMAIL = 'skadoosh.ai.lab@gmail.com';
 
-export async function sendAdminEmail(subject: string, text: string): Promise<boolean> {
+/** 寄信給任意收件者。
+ * ⚠️ Resend 網域未驗證前只能寄到帳號本人信箱（skadoosh），
+ *    寄給一般用戶會被 Resend 拒絕——正式網域驗證後（Phase 18B）自動恢復正常。
+ *    失敗回傳 false，呼叫端一律 fire-and-forget 不阻塞主流程。 */
+export async function sendEmail(to: string, subject: string, text: string): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return false;
   try {
@@ -17,7 +21,7 @@ export async function sendAdminEmail(subject: string, text: string): Promise<boo
       },
       body: JSON.stringify({
         from: 'FormoSA Ride <onboarding@resend.dev>',
-        to: [ADMIN_EMAIL],
+        to: [to],
         subject,
         text,
       }),
@@ -26,4 +30,8 @@ export async function sendAdminEmail(subject: string, text: string): Promise<boo
   } catch {
     return false;
   }
+}
+
+export async function sendAdminEmail(subject: string, text: string): Promise<boolean> {
+  return sendEmail(ADMIN_EMAIL, subject, text);
 }

@@ -8,6 +8,7 @@ const LINKS = [
   { href: '/privacy', label: 'Privacy 隱私政策' },
   { href: '/resources', label: 'Gov Resources 政府資源' },
   { href: '/feedback', label: 'Feedback 回饋意見' },
+  { href: '/contact', label: 'Contact 聯絡我們' },
 ];
 
 export function FooterLinks() {
