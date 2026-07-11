@@ -23,6 +23,11 @@ export default function HomePage() {
     <div className="flex h-dvh flex-col overflow-hidden">
       <Header />
       <main className="relative flex-1">
+        {/* 唯一 h1（螢幕閱讀器/SEO）：地圖頁本身無可見標題，補上關鍵字化的可爬取標題 */}
+        <h1 className="sr-only">
+          FormoSA Ride — Plan and navigate a bicycle or walking trip around Taiwan
+          (round-island Cycling Route No.1). 台灣自行車環島與徒步環島地圖、路線規劃與補給資訊。
+        </h1>
         <MapContainer />
         <POILayer />
         {/* useSearchParams 需要 Suspense 邊界（Next 15） */}

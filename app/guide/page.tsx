@@ -198,9 +198,70 @@ const SECTIONS: Section[] = [
   },
 ];
 
+// 常見問題（2026-07-11 墨西哥/菲律賓 9 天情境模擬）：
+// 回答首次來台者實際會 Google 的問題——同時是新手上手，也是高意圖長尾 SEO 內容。
+const FAQ: Array<{ q_en: string; q_zh: string; a_en: string; a_zh: string }> = [
+  {
+    q_en: 'How many days does it take to cycle around Taiwan?',
+    q_zh: '騎腳踏車環島要幾天？',
+    a_en: 'Most riders circle Taiwan on Cycling Route No.1 (about 940 km) in around 9 days, averaging ~105 km a day. This app gives you 9 ready-made day stages you can drop straight into a plan. Walking round-island takes much longer — usually 20–30 days.',
+    a_zh: '多數人沿「環島1號線」（約 940 公里）約 9 天完成，平均一天約 105 公里。系統提供 9 個現成日段，可直接排進行程。徒步環島則久得多，通常 20–30 天。',
+  },
+  {
+    q_en: 'Which direction should I ride, and where do I start?',
+    q_zh: '該順時針還逆時針？從哪裡出發？',
+    a_en: 'Counter-clockwise is the most popular direction (you ride on the side nearer the coast). Many start and finish in Taipei — our 9 suggested day stages are laid out that way, but you can start anywhere.',
+    a_zh: '逆時針最多人選（靠海側騎乘）。很多人從台北出發並繞回台北——系統的 9 個建議日段就是這樣排的，但你從哪裡開始都可以。',
+  },
+  {
+    q_en: 'Is cycling around Taiwan safe? Do I need experience?',
+    q_zh: '環島安全嗎？需要很有經驗嗎？',
+    a_en: 'Route No.1 mostly follows well-supplied roads — convenience stores are everywhere. Use the difficulty filter on the Routes page to pick flatter stages and avoid mountains. The app also warns you near accident hotspots and before sunset. Avoid night riding on mountain roads.',
+    a_zh: '環島1號線大多沿補給充足的道路，便利商店到處都是。用路線頁的難度篩選挑平緩路段、避開山區。系統也會在接近事故熱點與日落前提醒你。避免夜騎山路。',
+  },
+  {
+    q_en: 'Where do I sleep along the way?',
+    q_zh: '沿途住哪裡？',
+    a_en: 'Hotels, homestays, hostels and campgrounds are all on the map — filter by lodging type. Add the ones you like to your daily plan so each day has a place to stay.',
+    a_zh: '旅館、民宿、青年旅舍與露營區都在地圖上——可依住宿類型篩選。把喜歡的加進當日行程，每天都有落腳處。',
+  },
+  {
+    q_en: 'Do I need to speak Chinese?',
+    q_zh: '需要會講中文嗎？',
+    a_en: 'No. The app is English-first with Chinese alongside. If someone cannot understand you, open the bilingual phrasebook (inside the SOS page), tap to enlarge a card, and show it.',
+    a_zh: '不用。介面英文為主、中文為輔。對方聽不懂時，打開雙語溝通小卡（在 SOS 頁裡），點一下放大直接給對方看。',
+  },
+  {
+    q_en: 'Can I do a round-island trip on foot instead of by bike?',
+    q_zh: '可以徒步環島而不是騎車嗎？',
+    a_en: 'Yes. Supplies, water, toilets, lodging, weather, sunset alerts, the phrasebook and SOS all work the same on foot, and Journey Mode records walking trips too.',
+    a_zh: '可以。補給、飲水、廁所、住宿、天氣、日落提醒、溝通小卡與 SOS 徒步一樣適用，旅途模式也能記錄步行旅程。',
+  },
+  {
+    q_en: 'How do I plan my whole trip in the app?',
+    q_zh: '怎麼在系統裡規劃整趟行程？',
+    a_en: 'Open "Plan" in the bottom bar, create a trip, and add a day for each stage. For each day pick a route (or one of the 9 day stages), set your departure time and stops, then share the link or export a PDF for your group.',
+    a_zh: '點下方「Plan 規劃」，建立行程，逐日新增。每天挑一條路線（或 9 個日段之一），設出發時間與停靠點，再把連結分享給同伴或匯出 PDF。',
+  },
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map((f) => ({
+    '@type': 'Question',
+    name: f.q_en,
+    acceptedAnswer: { '@type': 'Answer', text: f.a_en },
+  })),
+};
+
 export default function GuidePage() {
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <Header />
       <main className="flex-1 overflow-y-auto bg-neutral-bg p-4">
         <h1 className="info-primary font-bold">❓ How to Use · 使用說明</h1>
@@ -221,6 +282,24 @@ export default function GuidePage() {
             ))}
           </section>
         ))}
+
+        {/* 常見問題（首次環島者最常 Google 的問題） */}
+        <section className="mt-4">
+          <h2 className="info-primary font-bold">
+            <span className="mr-2 text-2xl" aria-hidden>
+              🙋
+            </span>
+            FAQ · 常見問題
+          </h2>
+          {FAQ.map((f) => (
+            <div key={f.q_en} className="mt-3 rounded-2xl bg-white p-4">
+              <h3 className="info-secondary font-bold">{f.q_en}</h3>
+              <p className="text-sm font-bold text-neutral-text">{f.q_zh}</p>
+              <p className="info-secondary mt-2">{f.a_en}</p>
+              <p className="mt-1 text-sm text-neutral-text">{f.a_zh}</p>
+            </div>
+          ))}
+        </section>
 
         <p className="info-secondary mt-4 text-center text-neutral-text">
           Still have questions? Tell us via{' '}

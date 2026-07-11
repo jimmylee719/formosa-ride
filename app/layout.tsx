@@ -19,11 +19,14 @@ export const metadata: Metadata = {
     'cycling around Taiwan', 'Taiwan bike tour', 'Taiwan cycle route 1',
     'huan dao Taiwan', 'Taiwan bicycle camping', 'Taiwan cycling guide',
     'Taiwan cycling map', 'Taiwan cycling app',
+    // 高意圖長尾（規劃/天數/租車）：兩組 9 天情境模擬後補（2026-07-11）
+    'Taiwan cycling itinerary', '9 day Taiwan cycling', 'Taiwan cycle route 1 map',
+    'how many days to cycle around Taiwan', 'Taiwan bike rental', 'round island Taiwan',
     // 徒步環島（2026-07-11 Jimmy 指示：補給/天氣/住宿/安全資訊對徒步者同樣適用）
     'walking around Taiwan', 'Taiwan walking tour', 'hiking around Taiwan',
     'Taiwan round island on foot', 'Taiwan on foot',
-    '腳踏車環島', '自行車環島', '台灣環島路線', '環島一號線',
-    '環島露營', '腳踏車補給',
+    '腳踏車環島', '自行車環島', '單車環島', '台灣環島路線', '環島一號線',
+    '環島露營', '腳踏車補給', '環島規劃', '環島行程', '環島9天', '環島路線推薦',
     '徒步環島', '走路環島', '環島徒步', '徒步環島路線', '環島補給',
   ],
   authors: [{ name: 'Camper Road Taiwan' }],
@@ -45,7 +48,7 @@ export const metadata: Metadata = {
     siteName: 'FormoSA Ride 環島通',
     title: 'Taiwan Cycling Tour Guide | FormoSA Ride 環島通',
     description:
-      'Route maps, campsites, supply stops, weather and calorie planning for cycling around Taiwan — all in one app.',
+      'Route maps, a 9-day round-island itinerary, campsites, supply stops, weather and a day-by-day trip planner for cycling or walking around Taiwan — all in one app.',
     images: [
       {
         url: '/og-image.png',
@@ -59,7 +62,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Taiwan Cycling Tour Guide | FormoSA Ride 環島通',
     description:
-      'Route maps, campsites, supply stops, weather and calorie planning — one app for cycling around Taiwan.',
+      'Route maps, a 9-day itinerary, campsites, supply stops, weather and a trip planner — one app for cycling or walking around Taiwan.',
     images: ['/og-image.png'],
   },
   robots: {
@@ -97,12 +100,16 @@ const jsonLd = {
       operatingSystem: 'Web, iOS, Android (PWA)',
       featureList: [
         'Cycling Route No.1 Taiwan interactive map',
+        'Day-by-day round-island trip planner (share & export)',
+        '9 suggested day stages (~105 km each) for a round-island trip',
+        'Route difficulty filter by real elevation gain',
         'Real-time danger zone alerts',
         'Sunset/sunrise warnings',
         'Offline map support',
-        'POI: campsites, repair shops, convenience stores',
+        'POI: campsites, repair shops, convenience stores, lodging',
         'GPS trip recording',
-        'Multi-language: Chinese & English',
+        'Bilingual phrasebook (Chinese/English)',
+        'Works for cycling and walking round-island trips',
       ],
     },
     {
@@ -110,7 +117,7 @@ const jsonLd = {
       '@id': `${SITE_URL}/#route`,
       name: 'Taiwan Cycling Route No.1',
       description:
-        'The official 960.8km route around Taiwan island — ridden by cyclists and walked by round-island hikers',
+        'The round-island Cycling Route No.1 (about 940 km) — ridden by cyclists and walked by round-island hikers, typically over ~9 days',
       touristType: ['Cyclist', 'Hiker', 'Backpacker', 'Solo Traveller'],
       geo: {
         '@type': 'GeoShape',
