@@ -10,6 +10,8 @@ import type { POIType } from '@/types/poi';
 import type { PlanDay, PlanStop, TripPlanDetail } from '@/types/plan';
 import { MAX_DAYS_PER_PLAN } from '@/types/plan';
 import { AddStopSheet } from '@/components/plan/AddStopSheet';
+import { DayInsights } from '@/components/plan/DayInsights';
+import { setActivePlanDay } from '@/lib/active-plan-day';
 
 interface RouteOption {
   id: string;
@@ -17,6 +19,7 @@ interface RouteOption {
   name_en: string;
   type: string;
   distance_km: number;
+  counties: string[];
 }
 
 export function PlanEditor({ planId }: { planId: string }) {
@@ -128,6 +131,25 @@ export function PlanEditor({ planId }: { planId: string }) {
         return { ...d, stops };
       }),
     }));
+
+  // 「開始這一天」（Phase 19C）：停靠點交接給地圖旅途模式的清單
+  const startDay = (i: number) => {
+    if (!plan) return;
+    const day = plan.days[i];
+    if (!day) return;
+    setActivePlanDay({
+      planId: plan.id,
+      dayNumber: i + 1,
+      label: `${plan.name} · Day ${i + 1}`,
+      stops: day.stops.map((s) => ({
+        name_zh: s.poi ? s.poi.name_zh : (s.custom_name ?? ''),
+        name_en: s.poi ? s.poi.name_en : null,
+        done: false,
+      })),
+      savedAt: new Date().toISOString(),
+    });
+    router.push('/');
+  };
 
   const save = async () => {
     if (!plan || saving) return;
@@ -368,6 +390,27 @@ export function PlanEditor({ planId }: { planId: string }) {
             </select>
           </label>
 
+          {/* 智慧提醒（Phase 19C）：日落安全＋天氣＋補給空窗 */}
+          {day.route_id &&
+            (() => {
+              const rt = (routes ?? []).find((r) => r.id === day.route_id);
+              if (!rt) return null;
+              const dateISO = plan.start_date
+                ? new Date(new Date(plan.start_date).getTime() + i * 86400_000)
+                    .toISOString()
+                    .slice(0, 10)
+                : null;
+              return (
+                <DayInsights
+                  routeId={rt.id}
+                  routeDistanceKm={rt.distance_km}
+                  county={rt.counties[0] ?? null}
+                  dateISO={dateISO}
+                  departTime={day.depart_time}
+                />
+              );
+            })()}
+
           {/* 停靠點 */}
           <p className="info-secondary mt-3 font-bold">Stops 停靠點</p>
           {day.stops.length === 0 && (
@@ -449,6 +492,17 @@ export function PlanEditor({ planId }: { planId: string }) {
               className="tap-target mt-1 w-full rounded-xl border border-neutral-border p-3"
             />
           </label>
+
+          {/* 開始這一天（Phase 19C）：停靠點帶到地圖旅途模式當清單 */}
+          {day.stops.length > 0 && (
+            <button
+              type="button"
+              onClick={() => startDay(i)}
+              className="tap-target mt-3 w-full rounded-xl border-2 border-primary py-3 font-bold text-primary"
+            >
+              ▶️ Start this day 開始這一天（帶著 {day.stops.length} 個停靠點上路）
+            </button>
+          )}
         </section>
       ))}
 

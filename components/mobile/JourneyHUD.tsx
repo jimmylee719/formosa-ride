@@ -13,6 +13,12 @@ import {
 import { getDeviceId } from '@/lib/device-id';
 import { getAheadPOIs } from '@/lib/ahead-pois';
 import { checkProximityAlerts } from '@/lib/proximity-alerts';
+import {
+  getActivePlanDay,
+  toggleActiveStop,
+  clearActivePlanDay,
+  type ActivePlanDay,
+} from '@/lib/active-plan-day';
 import { crossedMilestone, countyChangeMessage } from '@/lib/milestones';
 import { nearestCounty } from '@/lib/taiwan-counties';
 import { POI_ICONS } from '@/lib/poi-icons';
@@ -32,6 +38,7 @@ export function JourneyHUD() {
   const [toast, setToast] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [planDay, setPlanDay] = useState<ActivePlanDay | null>(null);
   const trailRef = useRef<[number, number][]>([]);
   const drawTrailRef = useRef<(() => void) | null>(null);
   const prevKmRef = useRef(0);
@@ -150,6 +157,11 @@ export function JourneyHUD() {
       offPoint();
     };
   }, [drawTrail, showToast, checkProximity]);
+
+  // 「開始這一天」清單（Phase 19C）：規劃頁交接的當日停靠點
+  useEffect(() => {
+    setPlanDay(getActivePlanDay());
+  }, []);
 
   // 換底圖（夜間模式）後重繪軌跡
   useEffect(() => {
@@ -306,6 +318,46 @@ export function JourneyHUD() {
                 <p className="text-sm text-neutral-text">rest 休息 min</p>
               </div>
             </div>
+
+            {/* 當日規劃停靠點清單（Phase 19C「開始這一天」） */}
+            {planDay && planDay.stops.length > 0 && (
+              <div className="mt-3">
+                <p className="info-secondary flex items-center justify-between font-bold">
+                  <span>📋 {planDay.label}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearActivePlanDay();
+                      setPlanDay(null);
+                    }}
+                    className="text-sm font-normal text-neutral-text underline"
+                  >
+                    clear 清除
+                  </button>
+                </p>
+                <ul className="mt-1">
+                  {planDay.stops.map((s, i) => (
+                    <li key={i}>
+                      <button
+                        type="button"
+                        onClick={() => setPlanDay(toggleActiveStop(i))}
+                        className="tap-target flex w-full items-center gap-2 py-1 text-left"
+                      >
+                        <span aria-hidden>{s.done ? '✅' : '⬜'}</span>
+                        <span
+                          className={`info-secondary flex-1 truncate ${s.done ? 'text-neutral-text line-through' : ''}`}
+                        >
+                          {s.name_en || s.name_zh}
+                          {s.name_en && s.name_en !== s.name_zh && (
+                            <span className="text-neutral-text">（{s.name_zh}）</span>
+                          )}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {aheadPois.length > 0 && (
               <div className="mt-3">

@@ -1,5 +1,6 @@
-// GET /api/solar?lat=..&lng=.. — 日出日落（Phase 7，v3.0 B1）
-// 來源：SunriseSunset.io（免 Key）。快取 6 小時（solar_cache，RLS service-only）。
+// GET /api/solar?lat=..&lng=..[&date=YYYY-MM-DD] — 日出日落（Phase 7，v3.0 B1）
+// date 參數（Phase 19C）：旅程規劃的日落安全檢查需查未來日期，最多一年內。
+// 來源：SunriseSunset.io（免 Key，原生支援 date）。快取 6 小時（solar_cache）。
 // ⚠️ 實測欄位（2026-07-09）：civil twilight 結束 = `dusk`（規格原稿寫 civil_twilight_end，實際不存在）
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase-server';
@@ -34,7 +35,20 @@ export async function GET(req: NextRequest) {
   const today = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Taipei',
   }).format(new Date());
-  const cacheKey = `solar_${lat.toFixed(1)}_${lng.toFixed(1)}_${today}`;
+  // 指定日期（規劃用）：限一年內，避免快取被灌爆
+  const dateParam = req.nextUrl.searchParams.get('date');
+  let queryDate = today;
+  if (dateParam) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+      return NextResponse.json({ error: 'Invalid date' }, { status: 400 });
+    }
+    const diffDays = (new Date(dateParam).getTime() - new Date(today).getTime()) / 86400_000;
+    if (diffDays < -1 || diffDays > 366) {
+      return NextResponse.json({ error: 'Date out of range' }, { status: 400 });
+    }
+    queryDate = dateParam;
+  }
+  const cacheKey = `solar_${lat.toFixed(1)}_${lng.toFixed(1)}_${queryDate}`;
 
   const supabase = createServiceClient();
   const { data: cached } = await supabase
@@ -54,7 +68,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const res = await fetch(
-      `https://api.sunrisesunset.io/json?lat=${lat}&lng=${lng}&timezone=Asia/Taipei&date=${today}`,
+      `https://api.sunrisesunset.io/json?lat=${lat}&lng=${lng}&timezone=Asia/Taipei&date=${queryDate}`,
       { signal: AbortSignal.timeout(15_000) }
     );
     if (!res.ok) throw new Error(`sunrisesunset ${res.status}`);
@@ -65,7 +79,7 @@ export async function GET(req: NextRequest) {
     if (json.status !== 'OK') throw new Error('sunrisesunset status!=OK');
     const r = json.results;
     const solar: SolarData = {
-      date: r.date ?? today,
+      date: r.date ?? queryDate,
       sunrise: r.sunrise ?? '',
       sunset: r.sunset ?? '',
       dawn: r.dawn ?? '',
