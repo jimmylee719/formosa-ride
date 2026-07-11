@@ -4,8 +4,9 @@
  * 執行：npx tsx scripts/seed-night-warnings.ts
  * 可重複執行（已存在同名路段則跳過）。
  *
- * ⚠️ 尚待匯入（Phase 15 資料匯入階段處理，v3.0 C2 清單）：
- *   台18線（阿里山公路）、台14甲線（清境-合歡山）、台24線
+ * 2026-07-11 補齊 v3.0 C2 全清單（台18、台14甲、台24）。
+ * 註：規格原文把台24寫成「南橫公路」——南橫實為台20，台24 是屏東–霧台公路；
+ *     此處依 ref=24 的實際公路匯入並更正括號名稱（規格 reason 描述與台24 現況相符）。
  */
 import { createClient } from '@supabase/supabase-js';
 import { config } from 'dotenv';
@@ -48,6 +49,34 @@ const SEGMENTS: SegmentSpec[] = [
     reason_en: 'Narrow shoulder near sea, no lighting, limited visibility at night',
     refRegex: '(^|;)11(;|$)',
     bbox: [23.4, 121.3, 24.03, 121.66],
+  },
+  {
+    name_zh: '台18線（阿里山公路）',
+    name_en: 'Route 18 (Alishan Highway)',
+    severity: 'high',
+    reason_zh: '山區蜿蜒路段，夜間霧氣濃厚，視線極差，路燈稀少',
+    reason_en: 'Mountain switchbacks, heavy fog at night, very poor visibility',
+    refRegex: '(^|;)18(;|$)',
+    bbox: [23.3, 120.15, 23.55, 120.82],
+  },
+  {
+    name_zh: '台14甲線（清境至合歡山）',
+    name_en: 'Route 14A (Qingjing to Hehuanshan)',
+    severity: 'high',
+    reason_zh: '海拔 3000m+，夜間溫度驟降至 5°C 以下，路面可能結冰，無燈',
+    reason_en: 'Altitude 3000m+, freezing temps at night, possible ice, no lights',
+    refRegex: '(^|;)14甲(;|$)',
+    bbox: [24.04, 121.13, 24.21, 121.34],
+  },
+  {
+    // 規格原文誤植「南橫公路」（南橫=台20）；台24 實為屏東往霧台的山區公路
+    name_zh: '台24線（屏東至霧台）',
+    name_en: 'Route 24 (Pingtung to Wutai)',
+    severity: 'high',
+    reason_zh: '部分路段修復中，無路燈，路況不穩定',
+    reason_en: 'Sections under repair, no street lights, unstable road conditions',
+    refRegex: '(^|;)24(;|$)',
+    bbox: [22.6, 120.45, 22.82, 120.8],
   },
 ];
 
