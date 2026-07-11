@@ -129,8 +129,8 @@ const SECTIONS: Section[] = [
     title_zh: '溝通小卡',
     body: [
       {
-        en: 'Bottom-left of the map. If someone does not understand you, open it, tap a card to enlarge, and show them.',
-        zh: '在地圖左下角。對方聽不懂時，打開小卡、點一下放大，直接拿給對方看。',
+        en: 'Inside the SOS page (hold the SOS button 2 seconds). If someone does not understand you, open a card, tap to enlarge, and show them.',
+        zh: '在 SOS 頁面裡（長按 SOS 按鈕 2 秒）。對方聽不懂時，打開小卡、點一下放大，直接拿給對方看。',
       },
       {
         en: 'Tap 🔊 to play the Chinese audio.',

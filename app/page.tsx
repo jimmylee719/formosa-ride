@@ -16,7 +16,6 @@ import { DangerZoneLayer } from '@/components/map/DangerZoneLayer';
 import { DangerWarningCard } from '@/components/mobile/DangerWarningCard';
 import { JourneyHUD } from '@/components/mobile/JourneyHUD';
 import { OfflineBadge } from '@/components/mobile/OfflineBadge';
-import { PhrasebookFAB } from '@/components/mobile/PhrasebookFAB';
 import { InstallSuggestionBanner } from '@/components/mobile/InstallSuggestionBanner';
 
 export default function HomePage() {
@@ -34,7 +33,7 @@ export default function HomePage() {
         <NightWarningLayer />
         <DangerZoneLayer />
         <MapFAB />
-        <PhrasebookFAB />
+        {/* 溝通小卡入口移至 SOS 頁（2026-07-11 Jimmy 指示：FAB 擋住地圖） */}
         <OfflineBadge />
         <BannerQueue />
         <JourneyHUD />

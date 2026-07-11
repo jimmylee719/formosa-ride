@@ -2,6 +2,7 @@
 // /emergency — SOS 緊急資訊頁（Phase 12，v1.0 §十 + v11.0 A9）
 // 純資訊頁，離線也要能顯示靜態內容；撥號用 tel: 交給系統電話 App。
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/ui/Header';
 import { BottomNavBar } from '@/components/mobile/BottomNavBar';
@@ -140,6 +141,19 @@ export default function EmergencyPage() {
         >
           🏥 Find Nearby Hospitals 查詢附近醫院
         </button>
+
+        {/* 溝通小卡（2026-07-11 自地圖頁移入）：語言不通時拿卡片給對方看 */}
+        <Link
+          href="/phrasebook"
+          className="tap-target mt-3 flex w-full flex-col items-center rounded-2xl border-2 border-info-border bg-info-bg py-4 shadow"
+        >
+          <span className="info-primary font-bold text-info-text">
+            💬 Phrasebook 溝通小卡
+          </span>
+          <span className="info-secondary text-info-text">
+            Can&apos;t speak Chinese? Show locals a card · 語言不通時拿卡片給對方看
+          </span>
+        </Link>
 
         {/* 區塊 3：腳踏車事故處理步驟 */}
         <section className="mt-3 rounded-2xl bg-white p-4">
