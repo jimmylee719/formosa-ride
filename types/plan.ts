@@ -6,8 +6,14 @@ export interface PlanStop {
   custom_name: string | null;
   custom_google_url: string | null;
   note: string | null;
-  /** 顯示用（GET 時由伺服器 join，寫入時忽略） */
-  poi?: { name_zh: string; name_en: string | null; type: string } | null;
+  /** 顯示用（GET 時由伺服器 join，寫入時忽略）；lat/lng 供分享頁產生導航連結 */
+  poi?: {
+    name_zh: string;
+    name_en: string | null;
+    type: string;
+    lat?: number | null;
+    lng?: number | null;
+  } | null;
 }
 
 export interface PlanDay {

@@ -10,7 +10,7 @@ const DETAIL_SELECT = `id, name, start_date, notes, updated_at, share_token,
     routes ( name_zh, name_en, distance_km ),
     plan_stops (
       position, poi_id, custom_name, custom_google_url, note,
-      pois ( name_zh, name_en, type )
+      pois ( name_zh, name_en, type, lat, lng )
     )
   )`;
 
@@ -20,7 +20,13 @@ interface StopRow {
   custom_name: string | null;
   custom_google_url: string | null;
   note: string | null;
-  pois: { name_zh: string; name_en: string | null; type: string } | null;
+  pois: {
+    name_zh: string;
+    name_en: string | null;
+    type: string;
+    lat: number | null;
+    lng: number | null;
+  } | null;
 }
 interface DayRow {
   day_number: number;
