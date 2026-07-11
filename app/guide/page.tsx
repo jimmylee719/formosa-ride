@@ -65,12 +65,12 @@ const SECTIONS: Section[] = [
         zh: '🔴 紅色＝比較危險。🟠 橘色＝要注意。🟡 黃色＝保持警覺。',
       },
       {
-        en: 'Colored dots are accident hotspots from real police data. You can still ride there — just slow down and keep right.',
-        zh: '圓點是真實警政事故熱點。不是不能走，是提醒你騎慢一點、靠右一點。',
+        en: 'Accident hotspots (real police data) are not drawn on the map. Instead, Journey Mode warns you automatically when you get close to one.',
+        zh: '事故熱點（真實警政資料）不畫在地圖上。改為旅途模式中接近時自動跳出警示。',
       },
       {
-        en: 'Dark gray dashed lines are roads where bicycles are not allowed.',
-        zh: '深灰虛線是自行車禁止進入的路段。',
+        en: 'Dark gray dashed lines are roads where bicycles are not allowed. Remember: every national freeway in Taiwan bans bicycles.',
+        zh: '深灰虛線是自行車禁止進入的路段。記住：全台所有國道都禁行自行車。',
       },
     ],
   },
@@ -161,6 +161,22 @@ const SECTIONS: Section[] = [
       {
         en: 'On any route page, tap "Pre-trip backup card" and print it. If your phone dies, paper still works.',
         zh: '在路線頁點「行前備用卡」並列印。手機沒電時，紙本依然有效。',
+      },
+    ],
+  },
+  // 徒步環島（2026-07-11）：補給/天氣/住宿/安全/溝通小卡對徒步者同樣適用
+  {
+    icon: '🚶',
+    title_en: 'Walking around Taiwan?',
+    title_zh: '徒步環島？',
+    body: [
+      {
+        en: 'This app works for round-island walkers too. Supplies, water, toilets, lodging, weather, sunset alerts, the phrasebook and SOS are all just as useful on foot.',
+        zh: '這個 App 對徒步環島同樣好用。補給、飲水、廁所、住宿、天氣、日落提醒、溝通小卡和 SOS，走路環島一樣用得上。',
+      },
+      {
+        en: 'Journey Mode records walking trips the same way — distance, time and daily summaries.',
+        zh: '旅途模式一樣能記錄徒步旅程——距離、時間與每日總結。',
       },
     ],
   },

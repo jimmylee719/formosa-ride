@@ -12,6 +12,7 @@ import {
 } from '@/lib/journey-tracker';
 import { getDeviceId } from '@/lib/device-id';
 import { getAheadPOIs } from '@/lib/ahead-pois';
+import { checkProximityAlerts } from '@/lib/proximity-alerts';
 import { crossedMilestone, countyChangeMessage } from '@/lib/milestones';
 import { nearestCounty } from '@/lib/taiwan-counties';
 import { POI_ICONS } from '@/lib/poi-icons';
@@ -23,6 +24,7 @@ const TRAIL_LAYER = 'journey-trail-line';
 
 export function JourneyHUD() {
   const map = useMapStore((s) => s.map);
+  const setSelectedDanger = useMapStore((s) => s.setSelectedDanger);
   const router = useRouter();
   const [stats, setStats] = useState<JourneyStats | null>(null);
   const [expanded, setExpanded] = useState(false);
@@ -35,6 +37,8 @@ export function JourneyHUD() {
   const prevKmRef = useRef(0);
   const prevCountyRef = useRef<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastProxCheckRef = useRef(0);
+  const alertCooldownRef = useRef(new Map<string, number>());
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -87,6 +91,39 @@ export function JourneyHUD() {
     };
   }, [drawTrail]);
 
+  // 鄰近警示（v3.0 A6，2026-07-11 接線）：騎行中接近危險路段/事故熱點/禁行路段時
+  // 自動彈出 DangerWarningCard。60 秒節流；同一地點 30 分鐘冷卻，避免警示疲乏。
+  const checkProximity = useCallback(
+    async (lat: number, lng: number) => {
+      const now = Date.now();
+      if (now - lastProxCheckRef.current < 60_000) return;
+      lastProxCheckRef.current = now;
+      const alerts = await checkProximityAlerts(lat, lng, useMapStore.getState().isNightMode);
+      const alert = alerts.find(
+        (a) => now - (alertCooldownRef.current.get(a.name) ?? 0) > 30 * 60_000
+      );
+      if (!alert) return;
+      alertCooldownRef.current.set(alert.name, now);
+      if (useMapStore.getState().selectedDanger) return; // 已有警示卡開啟，不覆蓋
+      // 震動提醒（支援的裝置）：騎行中眼睛在路上，觸覺比視覺先到
+      navigator.vibrate?.(alert.level === 'high' || alert.level === 'restricted' ? [200, 100, 200] : 200);
+      setSelectedDanger({
+        kind: alert.type === 'restricted' ? 'restricted' : 'danger',
+        level: alert.level,
+        name_zh: alert.name,
+        name_en: alert.name_en,
+        reason_zh: alert.reason_zh,
+        reason_en: alert.reason_en,
+        accident_count: alert.accident_count,
+        accident_source: alert.accident_source,
+        data_year: alert.data_year,
+        road_number: alert.road_number,
+        law_basis: alert.law_basis,
+      });
+    },
+    [setSelectedDanger]
+  );
+
   // 訂閱統計與點位
   useEffect(() => {
     const offStats = journeyTracker.onStats((s) => {
@@ -106,12 +143,13 @@ export function JourneyHUD() {
         showToast(`${msg.zh} ${msg.en}`);
       }
       prevCountyRef.current = county;
+      void checkProximity(p.lat, p.lng);
     });
     return () => {
       offStats();
       offPoint();
     };
-  }, [drawTrail, showToast]);
+  }, [drawTrail, showToast, checkProximity]);
 
   // 換底圖（夜間模式）後重繪軌跡
   useEffect(() => {

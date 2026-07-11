@@ -1,5 +1,6 @@
 // lib/proximity-alerts.ts — 鄰近警示（Phase 8，v3.0 A6）
-// 距離危險/禁行路段 < 500m 時產生警示。Journey 模式（Phase 11）將定期呼叫。
+// 距離危險/禁行路段 < 500m、事故熱點 < 300m 時產生警示。
+// 由旅途模式（JourneyHUD）在 GPS 點位更新時節流呼叫。
 // 純資料函數：前後端皆可用（Node 測試時傳入 baseUrl）。
 import type { LineStringGeoJSON } from '@/types/route';
 import { DANGER_MESSAGES } from '@/lib/danger-messages';
@@ -10,9 +11,20 @@ export interface ProximityAlert {
   name: string;
   distanceM: number;
   message: (typeof DANGER_MESSAGES)['high'];
+  /** 供 DangerWarningCard 顯示完整資訊（與 SelectedDanger 對齊） */
+  name_en: string | null;
+  reason_zh: string | null;
+  reason_en: string | null;
+  accident_count: number | null;
+  accident_source: string | null;
+  data_year: number | null;
+  road_number: string | null;
+  law_basis: string | null;
 }
 
 const ALERT_RADIUS_M = 500;
+// 事故熱點為 500m 網格中心點：< 300m 約等於進入該網格範圍
+const POINT_ALERT_RADIUS_M = 300;
 
 /** 點到線段最短距離（公尺，等距圓柱近似——500m 尺度誤差可忽略） */
 export function distanceToLineStringM(
@@ -46,14 +58,33 @@ export function distanceToLineStringM(
   return best;
 }
 
+/** 點對點距離（公尺，等距圓柱近似——鄰近警示尺度誤差可忽略） */
+function distanceToPointM(lat: number, lng: number, pLat: number, pLng: number): number {
+  const mPerDegLat = 111_320;
+  const mPerDegLng = 111_320 * Math.cos((lat * Math.PI) / 180);
+  return Math.hypot((lng - pLng) * mPerDegLng, (lat - pLat) * mPerDegLat);
+}
+
 interface DangerFeature {
   name_zh: string;
+  name_en: string | null;
   level: 'high' | 'medium' | 'low';
-  geometry: LineStringGeoJSON | { type: string; coordinates: unknown };
+  geometry:
+    | LineStringGeoJSON
+    | { type: 'Point'; coordinates: [number, number] }
+    | { type: string; coordinates: unknown };
+  reason_zh: string | null;
+  reason_en: string | null;
+  accident_count?: number | null;
+  accident_source?: string | null;
+  data_year?: number | null;
 }
 interface RestrictedRoad {
   name_zh: string;
+  name_en: string | null;
   geometry: LineStringGeoJSON;
+  road_number: string | null;
+  law_basis: string | null;
 }
 
 export async function checkProximityAlerts(
@@ -68,7 +99,7 @@ export async function checkProximityAlerts(
   try {
     const [dzRes, rrRes] = await Promise.all([
       fetch(
-        `${baseUrl}/api/danger-zones?bbox=${lng - d},${lat - d},${lng + d},${lat + d}&night_mode=${isNightMode}`
+        `${baseUrl}/api/danger-zones?bbox=${lng - d},${lat - d},${lng + d},${lat + d}&night_mode=${isNightMode}&points=1`
       ),
       fetch(`${baseUrl}/api/restricted-roads`),
     ]);
@@ -76,17 +107,34 @@ export async function checkProximityAlerts(
     if (dzRes.ok) {
       const { features } = (await dzRes.json()) as { features: DangerFeature[] };
       for (const f of features) {
-        if (f.geometry.type !== 'LineString') continue;
-        const dist = distanceToLineStringM(lat, lng, f.geometry as LineStringGeoJSON);
-        if (dist < ALERT_RADIUS_M) {
-          alerts.push({
-            type: 'danger_zone',
-            level: f.level,
-            name: f.name_zh,
-            distanceM: Math.round(dist),
-            message: DANGER_MESSAGES[f.level],
-          });
+        let dist: number;
+        if (f.geometry.type === 'LineString') {
+          dist = distanceToLineStringM(lat, lng, f.geometry as LineStringGeoJSON);
+          if (dist >= ALERT_RADIUS_M) continue;
+        } else if (f.geometry.type === 'Point') {
+          // 事故熱點：低風險（5–9 件）不主動警示，避免市區騎行警示疲乏
+          if (f.level === 'low') continue;
+          const [pLng, pLat] = f.geometry.coordinates as [number, number];
+          dist = distanceToPointM(lat, lng, pLat, pLng);
+          if (dist >= POINT_ALERT_RADIUS_M) continue;
+        } else {
+          continue;
         }
+        alerts.push({
+          type: 'danger_zone',
+          level: f.level,
+          name: f.name_zh,
+          distanceM: Math.round(dist),
+          message: DANGER_MESSAGES[f.level],
+          name_en: f.name_en ?? null,
+          reason_zh: f.reason_zh ?? null,
+          reason_en: f.reason_en ?? null,
+          accident_count: f.accident_count ?? null,
+          accident_source: f.accident_source ?? null,
+          data_year: f.data_year ?? null,
+          road_number: null,
+          law_basis: null,
+        });
       }
     }
     if (rrRes.ok) {
@@ -100,6 +148,14 @@ export async function checkProximityAlerts(
             name: r.name_zh,
             distanceM: Math.round(dist),
             message: DANGER_MESSAGES.restricted,
+            name_en: r.name_en ?? null,
+            reason_zh: null,
+            reason_en: null,
+            accident_count: null,
+            accident_source: null,
+            data_year: null,
+            road_number: r.road_number ?? null,
+            law_basis: r.law_basis ?? null,
           });
         }
       }

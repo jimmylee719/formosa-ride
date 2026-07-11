@@ -2,6 +2,8 @@
 // components/map/DangerZoneLayer.tsx — 危險路段 + 禁行路段圖層（Phase 8，v3.0 A4）
 // 高風險：紅實線 + 2 秒緩慢閃爍；中風險：橘虛線；低風險：黃虛線；禁行：深灰虛線。
 // 點擊任一路段 → 寫入 store，由 DangerWarningCard 顯示底部警示卡。
+// 事故熱點（Point）不畫在地圖上（2026-07-11 Jimmy 指示：橘點鋪滿地圖太雜），
+// 改由旅途模式鄰近警示（lib/proximity-alerts.ts）在接近時提醒。
 import { useEffect, useRef } from 'react';
 import type maplibregl from 'maplibre-gl';
 import { useMapStore, type SelectedDanger } from '@/store/map-store';
@@ -9,7 +11,6 @@ import type { LineStringGeoJSON } from '@/types/route';
 
 const DANGER_SOURCE = 'danger-zones';
 const DANGER_LAYER = 'danger-zones-line';
-const DANGER_POINT_LAYER = 'danger-zones-point'; // Phase 15：事故熱點（Point 幾何）
 const RESTRICTED_SOURCE = 'restricted-roads';
 const RESTRICTED_LAYER = 'restricted-roads-line';
 const MIN_ZOOM = 7;
@@ -105,32 +106,6 @@ export function DangerZoneLayer() {
           ],
           'line-width': ['match', ['get', 'level'], 'high', 6, 'medium', 4, 3],
           'line-opacity': 0.7,
-        },
-      });
-      // 事故熱點（Point）：圓點標示，顏色語言與線段一致（Phase 15）
-      map.addLayer({
-        id: DANGER_POINT_LAYER,
-        type: 'circle',
-        source: DANGER_SOURCE,
-        filter: ['==', ['geometry-type'], 'Point'],
-        paint: {
-          'circle-color': [
-            'match',
-            ['get', 'level'],
-            'high', '#DC2626',
-            'medium', '#D97706',
-            '#CA8A04',
-          ],
-          'circle-radius': ['match', ['get', 'level'], 'high', 9, 'medium', 7, 6],
-          'circle-opacity': 0.45,
-          'circle-stroke-width': 2,
-          'circle-stroke-color': [
-            'match',
-            ['get', 'level'],
-            'high', '#DC2626',
-            'medium', '#D97706',
-            '#CA8A04',
-          ],
         },
       });
     };
@@ -241,7 +216,6 @@ export function DangerZoneLayer() {
     void setupAll();
     map.on('moveend', upsertDangerSource);
     map.on('click', DANGER_LAYER, onClickDanger);
-    map.on('click', DANGER_POINT_LAYER, onClickDanger);
     map.on('click', RESTRICTED_LAYER, onClickRestricted);
 
     // 高風險閃爍：每 2 秒 opacity 0.4 ↔ 0.8（v3.0 A4）
@@ -264,9 +238,8 @@ export function DangerZoneLayer() {
       try {
         map.off('moveend', upsertDangerSource);
         map.off('click', DANGER_LAYER, onClickDanger);
-        map.off('click', DANGER_POINT_LAYER, onClickDanger);
         map.off('click', RESTRICTED_LAYER, onClickRestricted);
-        for (const layer of [DANGER_LAYER, DANGER_POINT_LAYER, RESTRICTED_LAYER]) {
+        for (const layer of [DANGER_LAYER, RESTRICTED_LAYER]) {
           if (map.getLayer(layer)) map.removeLayer(layer);
         }
         for (const src of [DANGER_SOURCE, RESTRICTED_SOURCE]) {

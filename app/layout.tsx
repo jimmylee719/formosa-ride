@@ -14,13 +14,17 @@ export const metadata: Metadata = {
     template: '%s | FormoSA Ride',
   },
   description:
-    'The ultimate Taiwan cycling tour guide: official Cycling Route No.1 maps, campsites, water stations, repair shops, weather, and a calorie calculator — built for foreign cyclists and local riders. | 台灣自行車環島最完整的資訊平台：環島路線地圖、補水站、露營點、維修店、天氣預報、卡路里計算。',
+    'The ultimate Taiwan round-island guide for cyclists and walkers: official Cycling Route No.1 maps, campsites, water stations, repair shops, weather, and a calorie calculator — built for foreign travellers and local riders circling Taiwan by bike or on foot. | 台灣環島最完整的資訊平台（自行車環島＋徒步環島皆適用）：環島路線地圖、補水站、露營點、維修店、天氣預報、卡路里計算。',
   keywords: [
     'cycling around Taiwan', 'Taiwan bike tour', 'Taiwan cycle route 1',
     'huan dao Taiwan', 'Taiwan bicycle camping', 'Taiwan cycling guide',
     'Taiwan cycling map', 'Taiwan cycling app',
+    // 徒步環島（2026-07-11 Jimmy 指示：補給/天氣/住宿/安全資訊對徒步者同樣適用）
+    'walking around Taiwan', 'Taiwan walking tour', 'hiking around Taiwan',
+    'Taiwan round island on foot', 'Taiwan on foot',
     '腳踏車環島', '自行車環島', '台灣環島路線', '環島一號線',
     '環島露營', '腳踏車補給',
+    '徒步環島', '走路環島', '環島徒步', '徒步環島路線', '環島補給',
   ],
   authors: [{ name: 'Camper Road Taiwan' }],
   creator: 'Camper Road Taiwan',
@@ -86,7 +90,8 @@ const jsonLd = {
       '@type': 'WebApplication',
       '@id': `${SITE_URL}/#app`,
       name: 'FormoSA Ride 環島通',
-      description: 'Digital guide for cycling around Taiwan',
+      description:
+        'Digital guide for travelling around Taiwan island — by bicycle or on foot: maps, supplies, weather, accommodation and safety info',
       url: SITE_URL,
       applicationCategory: 'TravelApplication',
       operatingSystem: 'Web, iOS, Android (PWA)',
@@ -104,8 +109,9 @@ const jsonLd = {
       '@type': 'TouristAttraction',
       '@id': `${SITE_URL}/#route`,
       name: 'Taiwan Cycling Route No.1',
-      description: 'The official 960.8km cycling route around Taiwan island',
-      touristType: ['Cyclist', 'Backpacker', 'Solo Traveller'],
+      description:
+        'The official 960.8km route around Taiwan island — ridden by cyclists and walked by round-island hikers',
+      touristType: ['Cyclist', 'Hiker', 'Backpacker', 'Solo Traveller'],
       geo: {
         '@type': 'GeoShape',
         description: 'Circumnavigating Taiwan island by bicycle',

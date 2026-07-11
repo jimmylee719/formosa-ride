@@ -145,6 +145,47 @@ export function FilterModal() {
             </div>
           );
         })}
+
+        {/* 地圖圖例（2026-07-11）：解釋安全圖層的顏色語言，事故熱點不畫在地圖上 */}
+        <div className="mt-4 rounded-2xl border border-neutral-border p-4">
+          <p className="info-primary font-bold">Map legend 地圖圖例</p>
+          <ul className="mt-3 space-y-3">
+            <li className="flex items-center gap-3">
+              <span aria-hidden className="inline-block h-1.5 w-10 shrink-0 rounded bg-[#DC2626]" />
+              <span className="info-secondary">
+                High-risk road — Suhua Highway
+                <span className="block text-neutral-text">高風險路段（蘇花公路）</span>
+              </span>
+            </li>
+            <li className="flex items-center gap-3">
+              <span aria-hidden className="inline-block w-10 shrink-0 border-t-4 border-dashed border-[#334155]" />
+              <span className="info-secondary">
+                No bicycles by law (freeway)
+                <span className="block text-neutral-text">依法禁行自行車（國道）</span>
+              </span>
+            </li>
+            <li className="flex items-center gap-3">
+              <span aria-hidden className="inline-block h-1.5 w-10 shrink-0 rounded bg-[#8B5CF6]" />
+              <span className="info-secondary">
+                Unlit road (shown at night)
+                <span className="block text-neutral-text">無照明路段（夜間顯示）</span>
+              </span>
+            </li>
+            <li className="flex items-center gap-3">
+              <span aria-hidden className="inline-block h-1.5 w-10 shrink-0 rounded bg-[#16A34A]" />
+              <span className="info-secondary">
+                Selected cycling route
+                <span className="block text-neutral-text">選取的自行車路線</span>
+              </span>
+            </li>
+          </ul>
+          <p className="info-secondary mt-3 text-neutral-text">
+            Accident hotspots are not drawn on the map — Journey Mode alerts you
+            automatically when you approach one.
+            <br />
+            事故熱點不畫在地圖上——旅途模式中接近時會自動警示。
+          </p>
+        </div>
       </div>
 
       <div className="flex shrink-0 gap-3 border-t border-neutral-border p-4">

@@ -45,6 +45,16 @@ export function DangerWarningCard() {
       {danger.law_basis && (
         <p className="info-secondary mt-1">⚖️ {danger.law_basis}</p>
       )}
+      {danger.kind === 'restricted' && (
+        <p className="info-secondary mt-1 text-neutral-text">
+          🛣️ Note: ALL national freeways in Taiwan ban bicycles — not only this one. This
+          section is highlighted because it sits on the Taipei–Yilan leg of the
+          round-island route.
+          <span className="block">
+            提醒：全台所有國道依法皆禁行自行車，並非只有這一條。特別標示此路段，是因為它正好位在環島路線的台北–宜蘭段上。
+          </span>
+        </p>
+      )}
 
       <p className="info-primary mt-2 rounded-lg bg-white/70 p-2">
         💡 {msg.zh.action}
