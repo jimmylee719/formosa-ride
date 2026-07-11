@@ -27,11 +27,12 @@ export interface RouteListItem {
   counties: string[];
   official_route_code: string | null;
   is_free_tier: boolean;
+  /** 總爬升（2026-07-11 列表加入：山路愛好者選路關鍵） */
+  total_ascent_m: number | null;
 }
 
 export interface RouteDetail extends RouteListItem {
   geometry: LineStringGeoJSON;
-  total_ascent_m: number | null;
   total_descent_m: number | null;
   max_elevation_m: number | null;
   min_elevation_m: number | null;

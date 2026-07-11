@@ -36,6 +36,10 @@ export function RouteCard({ route }: { route: RouteListItem }) {
         <span className="info-secondary font-bold">
           📏 {route.distance_km} km
         </span>
+        {/* 總爬升（2026-07-11）：山路辨識關鍵，≥100m 才顯示 */}
+        {route.total_ascent_m != null && route.total_ascent_m >= 100 && (
+          <span className="info-secondary">⛰️ +{Math.round(route.total_ascent_m)}m</span>
+        )}
         {route.suggested_days != null && (
           <span className="info-secondary">🗓️ ~{route.suggested_days} days</span>
         )}

@@ -4,9 +4,9 @@ import { createAnonServerClient } from '@/lib/supabase-server';
 import type { RouteDetail, RouteListItem } from '@/types/route';
 
 const LIST_COLUMNS =
-  'id, slug, name_zh, name_en, type, distance_km, difficulty, suggested_days, counties, official_route_code, is_free_tier';
+  'id, slug, name_zh, name_en, type, distance_km, difficulty, suggested_days, counties, official_route_code, is_free_tier, total_ascent_m';
 
-const DETAIL_COLUMNS = `${LIST_COLUMNS}, geometry, total_ascent_m, total_descent_m, max_elevation_m, min_elevation_m, start_name_zh, end_name_zh, description_zh, description_en, tips_zh, tips_en, data_source, managing_authority, source_last_updated, is_loop`;
+const DETAIL_COLUMNS = `${LIST_COLUMNS}, geometry, total_descent_m, max_elevation_m, min_elevation_m, start_name_zh, end_name_zh, description_zh, description_en, tips_zh, tips_en, data_source, managing_authority, source_last_updated, is_loop`;
 
 export async function listRoutes(): Promise<RouteListItem[]> {
   const supabase = createAnonServerClient();

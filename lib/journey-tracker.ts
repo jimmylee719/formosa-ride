@@ -466,6 +466,42 @@ class JourneyTracker {
     if (!this.db) return [];
     return this.db.getAllFromIndex('trip_points', 'by-trip', tripId);
   }
+
+  /** 直接離開、不產生總結（2026-07-11 Jimmy 指示）：
+   *  停止追蹤並丟棄本機今日全部軌跡點；不呼叫 end-day、不記入多日續接。 */
+  async discard(): Promise<void> {
+    if (!this.trip) return;
+    const tripId = this.trip.tripId;
+    if (this.restTimer) {
+      clearTimeout(this.restTimer);
+      this.restTimer = null;
+    }
+    if (this.watchId != null) {
+      navigator.geolocation.clearWatch(this.watchId);
+      this.watchId = null;
+    }
+    if (this.syncTimer) {
+      clearInterval(this.syncTimer);
+      this.syncTimer = null;
+    }
+    window.removeEventListener('online', this.handleOnline);
+    if (this.db) {
+      await this.db.delete('active_trip', tripId);
+      const tx = this.db.transaction('trip_points', 'readwrite');
+      let cur = await tx.store.index('by-trip').openCursor(tripId);
+      while (cur) {
+        await cur.delete();
+        cur = await cur.continue();
+      }
+      await tx.done;
+    }
+    this.trip = null;
+    this.isResting = false;
+    this.currentSpeedKmh = 0;
+    this.headingDeg = null;
+    this.gradeAnchor = null;
+    this.currentGradePct = null;
+  }
 }
 
 export const journeyTracker = new JourneyTracker();

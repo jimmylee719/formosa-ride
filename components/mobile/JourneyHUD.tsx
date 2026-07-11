@@ -262,6 +262,26 @@ export function JourneyHUD() {
     }
   };
 
+  // 直接離開不產生總結（2026-07-11 Jimmy 指示）
+  const handleDiscard = async () => {
+    if (!stats) return;
+    if (
+      !window.confirm(
+        '離開旅途且「不」產生總結？今天的軌跡紀錄將被丟棄。\nLeave without a summary? Today\'s track will be discarded.'
+      )
+    ) {
+      return;
+    }
+    setBusy(true);
+    await journeyTracker.discard();
+    trailRef.current = [];
+    if (map?.getLayer(TRAIL_LAYER)) map.removeLayer(TRAIL_LAYER);
+    if (map?.getSource(TRAIL_SOURCE)) map.removeSource(TRAIL_SOURCE);
+    setStats(null);
+    setBusy(false);
+    showToast('已離開，未儲存 Left without saving');
+  };
+
   // ── 未在旅途中：開始按鈕 ──
   if (!stats) {
     return (
@@ -409,6 +429,15 @@ export function JourneyHUD() {
                 🏁 End Day 結束
               </button>
             </div>
+            {/* 不產生總結的離開（2026-07-11）：低調文字鈕，避免誤觸 */}
+            <button
+              type="button"
+              onClick={() => void handleDiscard()}
+              disabled={busy}
+              className="tap-target mt-1 w-full py-2 text-center text-sm text-neutral-text underline disabled:opacity-50"
+            >
+              🚪 Leave without saving 直接離開（不產生總結）
+            </button>
             {shareOpen && (
               <ShareModal tripId={stats.tripId} onClose={() => setShareOpen(false)} />
             )}

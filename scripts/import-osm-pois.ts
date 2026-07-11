@@ -96,6 +96,15 @@ const TYPE_SPECS: Record<string, TypeSpec> = {
     fallbackZh: '淋浴間',
     fallbackEn: 'Shower',
   },
+  // 露營區（2026-07-11 德國情侶情境模擬：野營旅客核心需求）。
+  // OSM tourism=camp_site 為既有露營場所；登記狀態 OSM 無從查證，
+  // UI 標籤已改為中性的「露營區/Campground」，不宣稱合法性。
+  campsite_legal: {
+    selector: '["tourism"="camp_site"]',
+    fallbackZh: '露營區',
+    fallbackEn: 'Campground',
+    isFreeTier: true,
+  },
 };
 
 // v1.0 §13.2 主要連鎖（名稱或品牌需命中其一）
@@ -119,6 +128,7 @@ interface PoiRow {
   phone: string | null;
   is_free: boolean;
   has_charging: boolean;
+  has_shower: boolean;
   water_available: boolean;
   is_24h: boolean;
   source_url: string;
@@ -194,6 +204,7 @@ function toRow(el: OsmElement, type: string, spec: TypeSpec): PoiRow | null {
     phone: t.phone || t['contact:phone'] || null,
     is_free: t.fee ? t.fee === 'no' : type !== 'convenience_store' && type !== 'supermarket' && type !== 'bicycle_repair',
     has_charging: spec.extra?.has_charging ?? false,
+    has_shower: type === 'shower' || t.shower === 'yes',
     water_available: spec.extra?.water_available ?? t.drinking_water === 'yes',
     is_24h: t.opening_hours === '24/7',
     source_url: `https://www.openstreetmap.org/${el.type}/${el.id}`,

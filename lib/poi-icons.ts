@@ -25,7 +25,8 @@ export const POI_LABELS: Record<POIType, { zh: string; en: string }> = {
   convenience_store: { zh: '便利商店', en: 'Convenience Store' },
   supermarket: { zh: '超市', en: 'Supermarket' },
   water_station: { zh: '補水站', en: 'Water Station' },
-  campsite_legal: { zh: '合法露營區', en: 'Campsite' },
+  // 2026-07-11：改中性名稱——來源 OSM 無法查證登記狀態，不宣稱「合法」
+  campsite_legal: { zh: '露營區', en: 'Campground' },
   campsite_wild: { zh: '野外紮營點', en: 'Wild Camping Spot' },
   temple_overnight: { zh: '廟宇過夜點', en: 'Temple (Overnight)' },
   public_toilet: { zh: '公共廁所', en: 'Public Toilet' },
