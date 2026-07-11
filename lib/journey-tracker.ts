@@ -37,6 +37,9 @@ export interface JourneyStats {
   currentSpeedKmh: number;
   isResting: boolean;
   headingDeg: number | null;
+  /** 即時座標（沿線跟騎/偏離提醒用；無定位時為 null） */
+  lat: number | null;
+  lng: number | null;
 }
 
 interface JourneyDB extends DBSchema {
@@ -87,6 +90,8 @@ class JourneyTracker {
   private lastRecordAt = 0;
   private lastMoveAt = 0;
   private currentSpeedKmh = 0;
+  private currentLat: number | null = null;
+  private currentLng: number | null = null;
   private headingDeg: number | null = null;
   private restDetectMs = 5 * 60_000; // 靜止 5 分鐘 → 休息（?fastrest=1 時縮短，QA 用）
   private syncing = false; // 互斥鎖：防止並發同步重複上傳同一批點
@@ -134,6 +139,8 @@ class JourneyTracker {
       currentSpeedKmh: Math.round(this.currentSpeedKmh * 10) / 10,
       isResting: this.isResting,
       headingDeg: this.headingDeg,
+      lat: this.currentLat,
+      lng: this.currentLng,
     };
   }
 
@@ -211,6 +218,8 @@ class JourneyTracker {
     if (!this.trip || this.trip.status !== 'active' || !this.db) return;
     const now = Date.now();
     this.currentSpeedKmh = speedKmh;
+    this.currentLat = lat;
+    this.currentLng = lng;
     const isMoving = speedKmh >= MIN_SPEED_KMH;
 
     // 休息偵測（v2.0：靜止 5 分鐘 → 休息中）
@@ -426,6 +435,8 @@ class JourneyTracker {
         currentSpeedKmh: 0,
         isResting: false,
         headingDeg: null,
+        lat: null,
+        lng: null,
       })
     );
   }

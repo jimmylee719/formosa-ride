@@ -148,7 +148,8 @@ export function PlanEditor({ planId }: { planId: string }) {
       })),
       savedAt: new Date().toISOString(),
     });
-    router.push('/');
+    // 若當天有指定路線，帶著 ?route= 進地圖：路線線自動顯示、沿線跟騎/偏離提醒自動生效
+    router.push(day.route_id ? `/?route=${day.route_id}` : '/');
   };
 
   const save = async () => {

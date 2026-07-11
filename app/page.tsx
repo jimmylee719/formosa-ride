@@ -18,6 +18,7 @@ import { JourneyHUD } from '@/components/mobile/JourneyHUD';
 import { OfflineBadge } from '@/components/mobile/OfflineBadge';
 import { InstallSuggestionBanner } from '@/components/mobile/InstallSuggestionBanner';
 import { NewcomerBanner } from '@/components/mobile/NewcomerBanner';
+import { RouteFollowGuard } from '@/components/mobile/RouteFollowGuard';
 
 export default function HomePage() {
   return (
@@ -34,6 +35,7 @@ export default function HomePage() {
         {/* useSearchParams 需要 Suspense 邊界（Next 15） */}
         <Suspense fallback={null}>
           <RouteLayer />
+          <RouteFollowGuard />
           <NightModeController />
         </Suspense>
         <NightWarningLayer />
