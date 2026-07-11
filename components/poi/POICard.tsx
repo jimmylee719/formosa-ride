@@ -61,7 +61,7 @@ export function POICard() {
           type="button"
           onClick={() => setSelectedPoi(null)}
           aria-label="關閉 Close"
-          className="tap-target shrink-0 rounded-full text-2xl leading-none text-neutral-text"
+          className="close-x"
         >
           ✕
         </button>

@@ -33,7 +33,7 @@ export function InstallGuideModal({
             type="button"
             onClick={onClose}
             aria-label="Close 關閉"
-            className="tap-target shrink-0 rounded-full text-2xl leading-none text-neutral-text"
+            className="close-x"
           >
             ✕
           </button>

@@ -28,7 +28,7 @@ export function FilterModal() {
         <button
           type="button"
           onClick={() => setFilterOpen(false)}
-          className="tap-target rounded-full text-2xl leading-none"
+          className="close-x"
           aria-label="Close 關閉"
         >
           ✕

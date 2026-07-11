@@ -85,7 +85,7 @@ export function ShareModal({
             type="button"
             onClick={onClose}
             aria-label="關閉 Close"
-            className="tap-target text-2xl leading-none text-neutral-text"
+            className="close-x"
           >
             ✕
           </button>

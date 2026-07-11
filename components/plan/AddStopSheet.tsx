@@ -114,7 +114,7 @@ export function AddStopSheet({
             type="button"
             onClick={onClose}
             aria-label="Close 關閉"
-            className="tap-target text-2xl leading-none"
+            className="close-x"
           >
             ✕
           </button>

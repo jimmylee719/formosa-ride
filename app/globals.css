@@ -43,6 +43,19 @@ button {
     @apply min-h-tap min-w-tap;
   }
 
+  /* 統一關閉鈕（2026-07-11 Jimmy）：44×44 命中區、28px 大叉、半透明圓底更顯眼 */
+  .close-x {
+    @apply flex min-h-tap min-w-tap shrink-0 items-center justify-center rounded-full text-neutral-text;
+    font-size: 28px;
+    line-height: 1;
+    background: rgba(0, 0, 0, 0.06);
+    transition: background 0.15s;
+  }
+  .close-x:hover,
+  .close-x:active {
+    background: rgba(0, 0, 0, 0.12);
+  }
+
   /* 追蹤頁的即時位置點（Phase 11A）：藍點 + 白框 + 呼吸圈 */
   .track-dot {
     width: 18px;

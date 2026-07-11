@@ -79,8 +79,8 @@ export function RoutesBrowser({ routes }: { routes: RouteListItem[] }) {
     <>
       {/* 篩選列（sticky）：第一層區域、第二層難度 */}
       <div className="sticky top-0 z-10 -mx-4 mb-3 bg-neutral-bg px-4 pb-2 pt-1">
-        {/* 區域頁籤（橫向可捲） */}
-        <div className="flex gap-2 overflow-x-auto">
+        {/* 區域頁籤（換行避免手機裁切） */}
+        <div className="flex flex-wrap gap-2">
           {REGIONS.map((reg) => {
             const n = regionCount(reg.key);
             if (n === 0) return null;
@@ -105,8 +105,8 @@ export function RoutesBrowser({ routes }: { routes: RouteListItem[] }) {
           })}
         </div>
 
-        {/* 難度晶片（橫向可捲）：難度＝總爬升；避開山路選 Easy */}
-        <div className="mt-2 flex items-center gap-2 overflow-x-auto">
+        {/* 難度晶片（換行避免手機裁切）：難度＝總爬升；避開山路選 Easy */}
+        <div className="mt-2 flex flex-wrap items-center gap-2">
           <span className="info-secondary shrink-0 text-neutral-text" aria-hidden>
             ⛰️
           </span>
