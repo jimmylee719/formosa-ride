@@ -52,6 +52,19 @@ export function MapContainer() {
     });
     map.on('load', () => setLoadFailed(false));
 
+    // 隱藏底圖的紅色登山步道圖層（2026-07-11 Jimmy 指示）：
+    // outdoor 底圖的 trail_red / trail_longdistance（徒步路線）為紅色實線，
+    // 與本系統「紅色＝危險路段」的顏色語言衝突且不可點擊，易被誤認。
+    // 僅隱藏紅色系步道；其他顏色步道與粉紅自行車路網保留（對使用者有參考價值）。
+    const hideRedTrails = () => {
+      for (const layer of map.getStyle()?.layers ?? []) {
+        if (/^(trail_red|trail_longdistance|viaferrata)/.test(layer.id)) {
+          map.setLayoutProperty(layer.id, 'visibility', 'none');
+        }
+      }
+    };
+    map.on('style.load', hideRedTrails); // 初次載入與夜間換底圖後皆執行
+
     map.on('moveend', () => {
       const c = map.getCenter();
       setView([c.lng, c.lat], map.getZoom());

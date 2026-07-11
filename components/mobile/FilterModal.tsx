@@ -178,6 +178,13 @@ export function FilterModal() {
                 <span className="block text-neutral-text">選取的自行車路線</span>
               </span>
             </li>
+            <li className="flex items-center gap-3">
+              <span aria-hidden className="inline-block w-10 shrink-0 border-t-4 border-dashed border-[#E61FD2]" />
+              <span className="info-secondary">
+                Bike route network (base map, not tappable)
+                <span className="block text-neutral-text">自行車路網（底圖資訊，不可點擊）</span>
+              </span>
+            </li>
           </ul>
           <p className="info-secondary mt-3 text-neutral-text">
             Accident hotspots are not drawn on the map — Journey Mode alerts you
