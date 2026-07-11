@@ -42,11 +42,19 @@ jobs:
       - name: 1/4 OSM POIs（Overpass API）
         run: npx tsx scripts/import-osm-pois.ts
 
-      - name: 2/4 觀光署合法旅宿
-        run: npx tsx scripts/import-hotels.ts
+      - name: 2/4 觀光署合法旅宿（下載官方 zip → 匯入）
+        run: |
+          curl -sSL -o /tmp/hotel.zip "https://media.taiwan.net.tw/XMLReleaseAll_public/v2.0/Zh_tw/Hotel-json.zip"
+          unzip -o /tmp/hotel.zip -d /tmp/hotel
+          FILE=$(find /tmp/hotel -iname '*.json' | head -1)
+          echo "匯入檔案：$FILE"
+          npx tsx scripts/import-hotels.ts "$FILE"
 
-      - name: 3/4 政府自行車路線
-        run: npx tsx scripts/import-gov-routes.ts
+      # 環島路網（OSM relation，線上即時抓取）。
+      # 內政部地方車道（moi）為半年釋出的 zip、網址隨期數變動，不納入月更，
+      # 新一期發布時手動執行 import-gov-routes.ts moi <資料夾>。
+      - name: 3/4 政府自行車路線（環島路網）
+        run: npx tsx scripts/import-gov-routes.ts huandao
 
       - name: 4/4 新路線海拔計算
         run: npx tsx scripts/precompute-elevation.ts

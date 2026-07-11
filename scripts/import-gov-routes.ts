@@ -216,7 +216,10 @@ async function main(): Promise<void> {
   const [cmd, arg] = process.argv.slice(2);
   if (cmd === 'huandao') await importHuandao();
   else if (cmd === 'moi' && arg) await importMoi(arg);
-  else console.log('用法：npx tsx scripts/import-gov-routes.ts huandao | moi <GeoJSON資料夾>');
+  else {
+    console.error('用法：npx tsx scripts/import-gov-routes.ts huandao | moi <GeoJSON資料夾>');
+    process.exit(1); // 缺參數必須響亮失敗（CI 曾因 exit 0 假成功，2026-07-11）
+  }
   const { count } = await supabase.from('routes').select('*', { count: 'exact', head: true });
   console.log(`routes 資料表目前共 ${count} 筆`);
 }

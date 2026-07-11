@@ -47,8 +47,8 @@ function subtypeOf(h: Hotel): string {
 async function main(): Promise<void> {
   const [path] = process.argv.slice(2);
   if (!path) {
-    console.log('用法：npx tsx scripts/import-hotels.ts <HotelList.json 路徑>');
-    process.exit(0);
+    console.error('用法：npx tsx scripts/import-hotels.ts <HotelList.json 路徑>');
+    process.exit(1); // 缺參數必須響亮失敗（CI 曾因 exit 0 假成功，2026-07-11）
   }
   let raw = readFileSync(path, 'utf8');
   if (raw.charCodeAt(0) === 0xfeff) raw = raw.slice(1);
