@@ -78,6 +78,16 @@ const SEGMENTS: SegmentSpec[] = [
     refRegex: '(^|;)24(;|$)',
     bbox: [22.6, 120.45, 22.82, 120.8],
   },
+  {
+    // 2026-07-11 Jimmy 確認：台24 與台20（真南橫）兩條都收
+    name_zh: '台20線（南橫公路）寶來至向陽段',
+    name_en: 'Route 20 (Southern Cross-Island Hwy) Baolai to Xiangyang',
+    severity: 'high',
+    reason_zh: '高山長隧道與崩塌整修路段，無路燈，部分時段管制通行',
+    reason_en: 'High-mountain tunnels and landslide repair zones, no lights, time-window traffic control',
+    refRegex: '(^|;)20(;|$)',
+    bbox: [22.95, 120.6, 23.35, 121.1],
+  },
 ];
 
 type Coord = [number, number];

@@ -64,6 +64,8 @@ export async function GET(req: NextRequest) {
     verification_count: 0,
     last_verified_at: null,
     accommodation_subtype: null,
+    photo_url: null,
+    website_url: null,
   }));
 
   if (rows.length > 0) {
@@ -74,12 +76,14 @@ export async function GET(req: NextRequest) {
       verification_count: number | null;
       last_verified_at: string | null;
       accommodation_subtype: string | null;
+      photo_url: string | null;
+      website_url: string | null;
     };
     const vMap = new Map<string, MergeRow>();
     for (let i = 0; i < ids.length; i += 100) {
       const { data: vData } = await supabase
         .from('pois')
-        .select('id, verification_count, last_verified_at, accommodation_subtype')
+        .select('id, verification_count, last_verified_at, accommodation_subtype, photo_url, website_url')
         .in('id', ids.slice(i, i + 100));
       for (const v of (vData ?? []) as MergeRow[]) vMap.set(v.id, v);
     }
@@ -91,6 +95,8 @@ export async function GET(req: NextRequest) {
             verification_count: v.verification_count ?? 0,
             last_verified_at: v.last_verified_at ?? null,
             accommodation_subtype: v.accommodation_subtype ?? null,
+            photo_url: v.photo_url ?? null,
+            website_url: v.website_url ?? null,
           }
         : p;
     });

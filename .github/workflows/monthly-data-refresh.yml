@@ -50,6 +50,12 @@ jobs:
           echo "匯入檔案：$FILE"
           npx tsx scripts/import-hotels.ts "$FILE"
 
+      - name: 2.5 觀光署官方景點（下載官方 zip → 匯入）
+        run: |
+          curl -sSL -o /tmp/attraction.zip "https://media.taiwan.net.tw/XMLReleaseAll_public/v2.0/Zh_tw/Attraction-json.zip"
+          unzip -o /tmp/attraction.zip -d /tmp/attraction
+          npx tsx scripts/import-attractions-tourism.ts /tmp/attraction/AttractionList.json
+
       # 環島路網（OSM relation，線上即時抓取）。
       # 內政部地方車道（moi）為半年釋出的 zip、網址隨期數變動，不納入月更，
       # 新一期發布時手動執行 import-gov-routes.ts moi <資料夾>。

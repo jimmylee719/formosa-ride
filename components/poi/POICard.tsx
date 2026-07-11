@@ -27,6 +27,16 @@ export function POICard() {
 
   return (
     <div className="absolute inset-x-0 bottom-0 z-20 max-h-[60%] overflow-y-auto rounded-t-2xl bg-white p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
+      {/* 官方照片（觀光署資料集，2026-07-11） */}
+      {poi.photo_url && (
+        // eslint-disable-next-line @next/next/no-img-element -- 觀光署開放資料圖床
+        <img
+          src={poi.photo_url}
+          alt={poi.name_zh}
+          loading="lazy"
+          className="mb-3 max-h-44 w-full rounded-xl object-cover"
+        />
+      )}
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="info-secondary text-neutral-text">
@@ -83,12 +93,31 @@ export function POICard() {
         <p className="info-secondary mt-1 text-neutral-text">{poi.description_en}</p>
       )}
 
+      {/* 開放時間（觀光署 ServiceTimeInfo，純文字） */}
+      {poi.opening_hours &&
+        typeof (poi.opening_hours as { text?: string }).text === 'string' && (
+          <p className="info-secondary mt-2 text-neutral-text">
+            🕐 {(poi.opening_hours as { text: string }).text}
+          </p>
+        )}
+
       {poi.phone && (
         <a
           href={`tel:${poi.phone}`}
           className="tap-target mt-2 flex items-center gap-2 text-info-border underline"
         >
           📞 {poi.phone}
+        </a>
+      )}
+
+      {poi.website_url && (
+        <a
+          href={poi.website_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="tap-target mt-1 flex items-center gap-2 text-info-border underline"
+        >
+          🌐 Official site 官方網站 ↗
         </a>
       )}
 

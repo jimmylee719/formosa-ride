@@ -54,6 +54,9 @@ export interface POIRecord {
   last_verified_at: string | null;
   /** 住宿子類型（Phase 15B，由 /api/pois 合併；僅 type='accommodation' 有值） */
   accommodation_subtype: string | null;
+  /** 官方照片與官網（觀光署資料集，2026-07-11；由 /api/pois 合併） */
+  photo_url: string | null;
+  website_url: string | null;
 }
 
 /** 「近期已驗證」判斷（v7.0 E3：30 天內累積 ≥3 人）*/
