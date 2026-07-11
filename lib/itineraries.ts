@@ -1,8 +1,10 @@
 // lib/itineraries.ts — 現成行程範本（2026-07-11）
 // 一鍵把「已規劃好的行程」灌進使用者的 Plan（可再自行編輯）。
-// 誠實原則（三鐵則）：只引用「真實存在的路線」。目前唯一能百分百誠實提供的是
-// 「9 天全環島」——即 9 個環島日段（huandao-stage-1..9），皆為實測幾何與海拔。
-// 其他天數（3/5/7）需另建真實內容（區域路線）或重切主線，待 Jimmy 定調後再加。
+//
+// 鐵律（2026-07-11 Jimmy 前提）：**絕不新增或修改任何正式路線資料**
+// （政府引進的資料一律不動）。行程是純資料層，只「引用」已存在的路線 slug。
+// 區域行程＝現有 9 個環島日段（huandao-stage-1..9，皆實測幾何/海拔）的子集，
+// 因此不需要在 DB 產生任何新路線。想要非環島、單區的行程也一樣——挑既有路線組合。
 // 純資料模組，Server/Client 皆可 import。
 
 export interface ItineraryDay {
@@ -60,6 +62,70 @@ export const ITINERARIES: Itinerary[] = [
         routeSlug: 'huandao-stage-9',
         note_en: 'Hilly finish back to Taipei (~1,200 m).',
         note_zh: '回台北的多坡收尾（約 1,200 公尺）。',
+      },
+    ],
+  },
+  // ── 區域行程（非全環島）：現有日段的子集，零新增資料 ──
+  {
+    id: 'westcoast-3',
+    name_en: 'West Coast Flat · 3 Days (one-way)',
+    name_zh: '西海岸平路・3 天（單程）',
+    days: 3,
+    distance_km: 316,
+    total_ascent_m: 833,
+    difficulty_en: 'All easy · flat, dense supplies',
+    difficulty_zh: '全易・平路、補給密集',
+    summary_en:
+      'The flat western third of Route No.1 (stages 2–4): Hsinchu → Changhua → Tainan → Pingtung. Perfect first bike trip — take the high-speed rail back from the south.',
+    summary_zh:
+      '環島1號線平坦的西段（第 2–4 段）：新竹→彰化→台南→屏東。最適合第一次騎行——回程搭高鐵北返。',
+    stages: [
+      { routeSlug: 'huandao-stage-2', note_en: 'West Coast Day 1', note_zh: '西海岸第 1 天' },
+      { routeSlug: 'huandao-stage-3', note_en: 'West Coast Day 2', note_zh: '西海岸第 2 天' },
+      { routeSlug: 'huandao-stage-4', note_en: 'West Coast Day 3', note_zh: '西海岸第 3 天' },
+    ],
+  },
+  {
+    id: 'south-east-3',
+    name_en: 'South Cape & East Coast · 3 Days',
+    name_zh: '南迴＋花東・3 天',
+    days: 3,
+    distance_km: 316,
+    total_ascent_m: 2218,
+    difficulty_en: 'All moderate · scenic, some climbs',
+    difficulty_zh: '全中・風景路線、有坡',
+    summary_en:
+      'The scenic south-east of Route No.1 (stages 5–7): Pingtung → the South Cape → Hualien → the East Rift Valley. Rolling hills, ocean and mountains — without the hardest Suhua climb.',
+    summary_zh:
+      '環島1號線風景最好的南東段（第 5–7 段）：屏東→南迴→花蓮→花東縱谷。有起伏、有海有山，但避開最硬的蘇花大爬升。',
+    stages: [
+      { routeSlug: 'huandao-stage-5', note_en: 'South Cape Day 1', note_zh: '南迴第 1 天' },
+      { routeSlug: 'huandao-stage-6', note_en: 'To Hualien Day 2', note_zh: '往花蓮第 2 天' },
+      { routeSlug: 'huandao-stage-7', note_en: 'East Rift Valley Day 3', note_zh: '花東縱谷第 3 天' },
+    ],
+  },
+  {
+    id: 'western-half-5',
+    name_en: 'Taipei to the South · 5 Days (western half)',
+    name_zh: '台北到南部・5 天（西半圈）',
+    days: 5,
+    distance_km: 527,
+    total_ascent_m: 2353,
+    difficulty_en: '3 easy · 2 moderate',
+    difficulty_zh: '3 易・2 中',
+    summary_en:
+      'The western half of the island (stages 1–5): Taipei all the way down to Pingtung. Mostly flat, city-to-city — a relaxed way to see the west without committing to the full loop.',
+    summary_zh:
+      '環島的西半圈（第 1–5 段）：從台北一路南下到屏東。多為平路、城市到城市——不必挑戰全環島也能輕鬆玩遍西部。',
+    stages: [
+      { routeSlug: 'huandao-stage-1' },
+      { routeSlug: 'huandao-stage-2' },
+      { routeSlug: 'huandao-stage-3' },
+      { routeSlug: 'huandao-stage-4' },
+      {
+        routeSlug: 'huandao-stage-5',
+        note_en: 'Longer climb today (~950 m).',
+        note_zh: '今天爬升較多（約 950 公尺）。',
       },
     ],
   },
