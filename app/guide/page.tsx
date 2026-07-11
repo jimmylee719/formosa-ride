@@ -89,6 +89,22 @@ const SECTIONS: Section[] = [
       },
     ],
   },
+  // 旅程規劃（Phase 19A）
+  {
+    icon: '🗓️',
+    title_en: 'Trip Planner',
+    title_zh: '旅程規劃',
+    body: [
+      {
+        en: 'Tap "Plan" in the bottom bar. Create up to 3 trips (e.g. coast vs. mountain) and plan day by day: departure time, stops, lodging.',
+        zh: '點下方「Plan 規劃」。最多建立 3 個行程（例如海線、山線），逐日排：出發時間、停靠點、住宿。',
+      },
+      {
+        en: 'Tap ⭐ on any place card on the map to save it, then add saved places to your plan quickly. Not in our database? Enter your own place with a Google Maps link.',
+        zh: '在地圖上點任何地點卡的 ⭐ 收藏，規劃時快速加入。資料庫沒有的地點，可自訂輸入並附 Google Maps 連結。',
+      },
+    ],
+  },
   {
     icon: '🚴',
     title_en: 'Journey Mode',

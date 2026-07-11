@@ -4,6 +4,8 @@
 // 開發模擬：dev 環境下 window.__journeySimulate(lat, lng, speedKmh) 可注入位置。
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import { getDeviceId } from '@/lib/device-id';
+import { metForRide } from '@/lib/calories';
+import { getRiderWeightKg } from '@/lib/rider-weight';
 
 export interface TrackedPoint {
   id?: number;
@@ -53,8 +55,8 @@ interface JourneyDB extends DBSchema {
 const MOVING_INTERVAL_MS = 30_000; // 移動中 30 秒記一點（v2.0）
 const STATIC_INTERVAL_MS = 120_000; // 靜止時 2 分鐘記一點
 const MIN_SPEED_KMH = 2; // 低於 2km/h 視為靜止
-const DEFAULT_WEIGHT_KG = 70; // 卡路里估算預設體重（設定頁於後續 Phase 提供）
 const SYNC_BATCH = 200;
+const GRADE_WINDOW_KM = 0.1; // 坡度計算距離窗（GPS 海拔噪音需要 ≥100m 平滑）
 
 function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number): number {
   const R = 6371;
@@ -66,14 +68,6 @@ function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number): nu
       Math.cos((bLat * Math.PI) / 180) *
       Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
-}
-
-/** 依速度選 MET（騎行中海拔未知，以平路表近似；精確版於路線剖面用 lib/calories.ts） */
-function metForSpeed(speedKmh: number): number {
-  if (speedKmh < MIN_SPEED_KMH) return 0;
-  if (speedKmh < 16) return 6.8;
-  if (speedKmh < 19) return 8.0;
-  return 10.0;
 }
 
 function bearingDeg(aLat: number, aLng: number, bLat: number, bLng: number): number {
@@ -99,6 +93,9 @@ class JourneyTracker {
   private lastMoveAt = 0;
   private currentSpeedKmh = 0;
   private headingDeg: number | null = null;
+  // 即時坡度（Phase 19A）：GPS 海拔以 ≥100m 距離窗計算，供雙因子 MET 卡路里
+  private gradeAnchor: { distKm: number; ele: number } | null = null;
+  private currentGradePct: number | null = null;
   private restDetectMs = 5 * 60_000; // 靜止 5 分鐘 → 休息（?fastrest=1 時縮短，QA 用）
   private syncing = false; // 互斥鎖：防止並發同步重複上傳同一批點
   private listeners = new Set<Listener>();
@@ -166,6 +163,8 @@ class JourneyTracker {
   async start(resumeTripId?: string): Promise<string> {
     await this.init();
     if (this.trip && this.trip.status === 'active') return this.trip.tripId;
+    this.gradeAnchor = null;
+    this.currentGradePct = null;
     if (!this.trip) {
       this.trip = {
         tripId: resumeTripId ?? crypto.randomUUID(),
@@ -239,7 +238,9 @@ class JourneyTracker {
       if (this.lastMoveAt > 0) {
         const dt = Math.min(now - this.lastMoveAt, 5 * 60_000);
         this.trip.ridingMs += dt;
-        this.trip.calories += (metForSpeed(speedKmh) * DEFAULT_WEIGHT_KG * dt) / 3600_000;
+        // 雙因子 MET（速度＋坡度，Phase 19A）×用戶設定體重（預設 70kg）
+        this.trip.calories +=
+          (metForRide(speedKmh, this.currentGradePct) * getRiderWeightKg() * dt) / 3600_000;
       }
       this.lastMoveAt = now;
     } else {
@@ -276,6 +277,20 @@ class JourneyTracker {
     }
     this.trip.lastLat = lat;
     this.trip.lastLng = lng;
+
+    // 坡度更新（Phase 19A）：每累積 ≥100m 距離以海拔差重算，夾限 ±20% 防噪音
+    if (elevation != null) {
+      if (!this.gradeAnchor) {
+        this.gradeAnchor = { distKm: this.trip.totalDistanceKm, ele: elevation };
+      } else {
+        const dKm = this.trip.totalDistanceKm - this.gradeAnchor.distKm;
+        if (dKm >= GRADE_WINDOW_KM) {
+          const raw = ((elevation - this.gradeAnchor.ele) / (dKm * 1000)) * 100;
+          this.currentGradePct = Math.max(-20, Math.min(20, raw));
+          this.gradeAnchor = { distKm: this.trip.totalDistanceKm, ele: elevation };
+        }
+      }
+    }
 
     const point: TrackedPoint = {
       tripId: this.trip.tripId,

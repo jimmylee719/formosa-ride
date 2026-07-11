@@ -4,6 +4,7 @@ import { useMapStore } from '@/store/map-store';
 import { POI_ICONS, POI_LABELS } from '@/lib/poi-icons';
 import { GoogleMapsButton } from '@/components/poi/GoogleMapsButton';
 import { VerifyButton } from '@/components/poi/VerifyButton';
+import { FavoriteButton } from '@/components/poi/FavoriteButton';
 import { isRecentlyVerified, ACCOMMODATION_SUBTYPES } from '@/types/poi';
 
 export function POICard() {
@@ -93,6 +94,11 @@ export function POICard() {
 
       <div className="mt-3">
         <VerifyButton poiId={poi.id} />
+      </div>
+
+      {/* 收藏（Phase 19A）：收藏後可在旅程規劃快速加入 */}
+      <div className="mt-3">
+        <FavoriteButton poiId={poi.id} />
       </div>
 
       <div className="mt-3">

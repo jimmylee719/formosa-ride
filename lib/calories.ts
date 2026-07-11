@@ -12,6 +12,25 @@ export const MET_TABLE = {
   downhill: 4.0, // 下坡（省力）
 } as const;
 
+/**
+ * 騎行中即時 MET（Phase 19A 升級）：實測速度＋實測坡度雙因子。
+ * 坡度未知（GPS 無海拔）時回退純速度表。
+ * 坡度來源為 GPS 海拔差，已在 tracker 端以 ≥100m 距離窗平滑並夾限 ±20%。
+ */
+export function metForRide(speedKmh: number, gradePct: number | null): number {
+  if (speedKmh < 2) return 0; // 靜止
+  if (gradePct != null) {
+    if (gradePct > 10) return MET_TABLE.uphill_steep;
+    if (gradePct > 6) return MET_TABLE.uphill_10;
+    if (gradePct > 3) return MET_TABLE.uphill_6;
+    if (gradePct > 1) return MET_TABLE.uphill_3; // 1% 以下視為平路（GPS 海拔噪音帶）
+    if (gradePct < -3) return MET_TABLE.downhill;
+  }
+  if (speedKmh < 16) return MET_TABLE.flat_easy;
+  if (speedKmh < 19) return MET_TABLE.flat_moderate;
+  return MET_TABLE.flat_fast;
+}
+
 export const SPEED_MODIFIER = {
   beginner: 0.8, // 初級：-20% 速度
   intermediate: 1.0,

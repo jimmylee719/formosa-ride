@@ -1,6 +1,7 @@
 'use client';
 // components/mobile/BottomNavBar.tsx — 底部快捷欄（64px，v1.0 §四）
-// 地圖 | 路線 | 計算 | SOS | 我的；每個項目 ≥44×44px
+// 地圖 | 路線 | 規劃 | SOS | 我的；每個項目 ≥44×44px
+// （2026-07-11 Jimmy 指示：第 3 格由卡路里計算改為旅程規劃）
 // SOS 需長按 2 秒才開啟（v10.0/v11.0 A9：防誤觸保護）。
 
 import Link from 'next/link';
@@ -11,7 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 const LEFT_ITEMS = [
   { href: '/', icon: '🗺️', label_zh: '地圖', label_en: 'Map' },
   { href: '/routes', icon: '🛤️', label_zh: '路線', label_en: 'Routes' },
-  { href: '/calculator', icon: '🔥', label_zh: '計算', label_en: 'Calories' },
+  { href: '/plan', icon: '🗓️', label_zh: '規劃', label_en: 'Plan' },
 ] as const;
 const PROFILE_ITEM = { href: '/profile', icon: '👤', label_zh: '我的', label_en: 'Me' } as const;
 type NavItem = (typeof LEFT_ITEMS)[number] | typeof PROFILE_ITEM;

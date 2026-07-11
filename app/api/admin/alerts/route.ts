@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase-server';
 
 export interface PendingAlert {
-  alert_type: 'payment_webhook_failed' | 'user_error_report' | 'system_outage';
+  alert_type: 'payment_webhook_failed' | 'user_error_report' | 'system_outage' | 'suggested_place';
   reference: string;
   message: string;
   created_at: string;
@@ -19,7 +19,23 @@ export async function GET() {
   if (error) {
     return NextResponse.json({ error: '查詢失敗' }, { status: 500 });
   }
-  return NextResponse.json({ alerts: (data ?? []) as PendingAlert[] });
+  const alerts = (data ?? []) as PendingAlert[];
+
+  // 用戶建議地點（Phase 19A）：view 定義不動，於此追加。
+  // 表未建（migration 0016 未貼）時靜默略過，不影響其他警示。
+  const { data: suggested } = await supabase
+    .from('suggested_places')
+    .select('id, name, created_at')
+    .eq('status', 'pending');
+  for (const s of suggested ?? []) {
+    alerts.push({
+      alert_type: 'suggested_place',
+      reference: s.id as string,
+      message: `用戶建議新地點：「${s.name}」`,
+      created_at: s.created_at as string,
+    });
+  }
+  return NextResponse.json({ alerts });
 }
 
 export async function PATCH(req: NextRequest) {

@@ -14,6 +14,7 @@ const TYPE_LABEL: Record<string, string> = {
   payment_webhook_failed: '💳 付款Webhook',
   user_error_report: '🐛 錯誤回報',
   system_outage: '🔴 系統停機',
+  suggested_place: '📍 建議地點',
 };
 
 export function AlertsBanner() {
@@ -70,14 +71,24 @@ export function AlertsBanner() {
             <span className="text-neutral-text">
               {new Date(a.created_at).toLocaleString('zh-TW')}
             </span>
-            <button
-              type="button"
-              onClick={() => resolve(a)}
-              disabled={busy === a.reference}
-              className="rounded-lg border border-neutral-border px-3 py-1.5 font-bold disabled:opacity-50"
-            >
-              ✓ 標記已處理
-            </button>
+            {a.alert_type === 'suggested_place' ? (
+              // 建議地點：到審核頁採用/退回，不在橫幅直接消化
+              <a
+                href="/admin/places"
+                className="rounded-lg border border-neutral-border px-3 py-1.5 font-bold"
+              >
+                → 前往審核
+              </a>
+            ) : (
+              <button
+                type="button"
+                onClick={() => resolve(a)}
+                disabled={busy === a.reference}
+                className="rounded-lg border border-neutral-border px-3 py-1.5 font-bold disabled:opacity-50"
+              >
+                ✓ 標記已處理
+              </button>
+            )}
           </li>
         ))}
       </ul>

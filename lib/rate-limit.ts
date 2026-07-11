@@ -6,12 +6,13 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 
-type LimiterName = 'login' | 'feedback';
+type LimiterName = 'login' | 'feedback' | 'suggest';
 
-/** 各情境限制（沿用既有數字）：登入 5 次/15 分、回饋 3 次/10 分 */
+/** 各情境限制：登入 5 次/15 分、回饋 3 次/10 分、建議地點 5 次/10 分（Phase 19A） */
 const LIMITS: Record<LimiterName, { tokens: number; window: `${number} m` }> = {
   login: { tokens: 5, window: '15 m' },
   feedback: { tokens: 3, window: '10 m' },
+  suggest: { tokens: 5, window: '10 m' },
 };
 
 const hasUpstash =

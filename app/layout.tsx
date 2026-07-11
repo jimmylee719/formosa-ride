@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     template: '%s | FormoSA Ride',
   },
   description:
-    'The ultimate Taiwan round-island guide for cyclists and walkers: official Cycling Route No.1 maps, campsites, water stations, repair shops, weather, and a calorie calculator — built for foreign travellers and local riders circling Taiwan by bike or on foot. | 台灣環島最完整的資訊平台（自行車環島＋徒步環島皆適用）：環島路線地圖、補水站、露營點、維修店、天氣預報、卡路里計算。',
+    'The ultimate Taiwan round-island guide for cyclists and walkers: official Cycling Route No.1 maps, campsites, water stations, repair shops, weather, and a day-by-day trip planner — built for foreign travellers and local riders circling Taiwan by bike or on foot. | 台灣環島最完整的資訊平台（自行車環島＋徒步環島皆適用）：環島路線地圖、補水站、露營點、維修店、天氣預報、旅程規劃。',
   keywords: [
     'cycling around Taiwan', 'Taiwan bike tour', 'Taiwan cycle route 1',
     'huan dao Taiwan', 'Taiwan bicycle camping', 'Taiwan cycling guide',
