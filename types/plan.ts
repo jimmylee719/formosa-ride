@@ -32,6 +32,8 @@ export interface TripPlanMeta {
 
 export interface TripPlanDetail extends Omit<TripPlanMeta, 'day_count'> {
   days: PlanDay[];
+  /** 分享 token（Phase 19B；僅擁有者的 GET 回傳） */
+  share_token?: string | null;
 }
 
 export interface FavoriteItem {

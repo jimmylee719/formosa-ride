@@ -4,6 +4,7 @@
 // DELETE { deviceId } → 刪除
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase-server';
+import { getPlanDetail } from '@/lib/plan-queries';
 import { MAX_DAYS_PER_PLAN, MAX_STOPS_PER_DAY } from '@/types/plan';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
@@ -39,72 +40,12 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   const denied = await assertOwner(supabase, id, deviceId);
   if (denied) return denied;
 
-  const { data, error } = await supabase
-    .from('trip_plans')
-    .select(
-      `id, name, start_date, notes, updated_at,
-       plan_days (
-         day_number, depart_time, start_name, route_id, notes,
-         routes ( name_zh, name_en, distance_km ),
-         plan_stops (
-           position, poi_id, custom_name, custom_google_url, note,
-           pois ( name_zh, name_en, type )
-         )
-       )`
-    )
-    .eq('id', id)
-    .single();
-  if (error || !data) {
-    console.error('[api/plans/id] detail error:', error?.message);
+  const detail = await getPlanDetail(supabase, id);
+  if (!detail) {
+    console.error('[api/plans/id] detail error');
     return NextResponse.json({ error: 'Query failed' }, { status: 500 });
   }
-
-  type StopRow = {
-    position: number;
-    poi_id: string | null;
-    custom_name: string | null;
-    custom_google_url: string | null;
-    note: string | null;
-    pois: { name_zh: string; name_en: string | null; type: string } | null;
-  };
-  type DayRow = {
-    day_number: number;
-    depart_time: string | null;
-    start_name: string | null;
-    route_id: string | null;
-    notes: string | null;
-    routes: { name_zh: string; name_en: string; distance_km: number } | null;
-    plan_stops: StopRow[];
-  };
-  // supabase-js 對 FK join 推斷為陣列，實際 to-one 回傳物件 → 經 unknown 轉型
-  const days = ((data.plan_days ?? []) as unknown as DayRow[])
-    .sort((a, b) => a.day_number - b.day_number)
-    .map((d) => ({
-      day_number: d.day_number,
-      depart_time: d.depart_time,
-      start_name: d.start_name,
-      route_id: d.route_id,
-      notes: d.notes,
-      route: d.routes,
-      stops: d.plan_stops
-        .sort((a, b) => a.position - b.position)
-        .map((s) => ({
-          poi_id: s.poi_id,
-          custom_name: s.custom_name,
-          custom_google_url: s.custom_google_url,
-          note: s.note,
-          poi: s.pois,
-        })),
-    }));
-
-  return NextResponse.json({
-    id: data.id,
-    name: data.name,
-    start_date: data.start_date,
-    notes: data.notes,
-    updated_at: data.updated_at,
-    days,
-  });
+  return NextResponse.json(detail);
 }
 
 export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {

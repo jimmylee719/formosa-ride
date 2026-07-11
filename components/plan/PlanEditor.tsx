@@ -28,6 +28,8 @@ export function PlanEditor({ planId }: { planId: string }) {
   const [savedFlash, setSavedFlash] = useState(false);
   const [addStopFor, setAddStopFor] = useState<number | null>(null);
   const [routes, setRoutes] = useState<RouteOption[] | null>(null);
+  const [shareBusy, setShareBusy] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     void (async () => {
@@ -156,6 +158,56 @@ export function PlanEditor({ planId }: { planId: string }) {
     }
   };
 
+  // 分享連結（Phase 19B）：建立/複製/停用
+  const shareUrl = plan?.share_token
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/plan/shared/${plan.share_token}`
+    : null;
+
+  const enableShare = async () => {
+    if (!plan || shareBusy) return;
+    setShareBusy(true);
+    try {
+      const res = await fetch(`/api/plans/${plan.id}/share`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deviceId: getDeviceId() }),
+      });
+      if (res.ok) {
+        const { token } = (await res.json()) as { token: string };
+        setPlan((p) => (p ? { ...p, share_token: token } : p));
+      }
+    } finally {
+      setShareBusy(false);
+    }
+  };
+
+  const disableShare = async () => {
+    if (!plan || shareBusy) return;
+    if (!window.confirm('Disable the share link? 停用分享連結？（已拿到連結的人將無法再開啟）')) return;
+    setShareBusy(true);
+    try {
+      const res = await fetch(`/api/plans/${plan.id}/share`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deviceId: getDeviceId() }),
+      });
+      if (res.ok) setPlan((p) => (p ? { ...p, share_token: null } : p));
+    } finally {
+      setShareBusy(false);
+    }
+  };
+
+  const copyShareUrl = async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      window.prompt('Copy manually 請手動複製:', shareUrl);
+    }
+  };
+
   if (loadError) {
     return (
       <p className="info-secondary rounded-2xl bg-white p-6 text-center text-neutral-text">
@@ -203,6 +255,60 @@ export function PlanEditor({ planId }: { planId: string }) {
             className="tap-target mt-1 w-full rounded-xl border border-neutral-border p-3"
           />
         </label>
+      </div>
+
+      {/* 分享與列印（Phase 19B） */}
+      <div className="mt-3 rounded-2xl bg-white p-4 shadow-sm">
+        <div className="flex gap-3">
+          <Link
+            href={`/plan/${plan.id}/print`}
+            className="tap-target flex-1 rounded-xl border border-neutral-border py-3 text-center font-bold"
+          >
+            🖨️ Print / PDF
+          </Link>
+          {!shareUrl ? (
+            <button
+              type="button"
+              onClick={() => void enableShare()}
+              disabled={shareBusy}
+              className="tap-target flex-1 rounded-xl border border-neutral-border py-3 font-bold disabled:opacity-50"
+            >
+              🔗 Share 分享
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => void disableShare()}
+              disabled={shareBusy}
+              className="tap-target flex-1 rounded-xl border border-neutral-border py-3 text-neutral-text disabled:opacity-50"
+            >
+              🚫 Stop sharing 停用分享
+            </button>
+          )}
+        </div>
+        {shareUrl && (
+          <div className="mt-3">
+            <p className="info-secondary text-neutral-text">
+              Anyone with this link can view (read-only) and copy this plan.
+              拿到連結的人可查看（唯讀）並複製這份行程。
+            </p>
+            <div className="mt-1 flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value={shareUrl}
+                className="min-w-0 flex-1 rounded-xl border border-neutral-border p-2 text-sm text-neutral-text"
+              />
+              <button
+                type="button"
+                onClick={() => void copyShareUrl()}
+                className="tap-target shrink-0 rounded-xl bg-primary px-4 py-2 font-bold text-white"
+              >
+                {copied ? '✅' : 'Copy 複製'}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 逐日 */}
