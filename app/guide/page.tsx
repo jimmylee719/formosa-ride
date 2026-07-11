@@ -46,8 +46,8 @@ const SECTIONS: Section[] = [
     title_zh: '篩選地點',
     body: [
       {
-        en: 'Tap the Filter button at the top-left of the map. Pick a big category, or expand it for details.',
-        zh: '點地圖左上角的 Filter 按鈕。點大分類快速選，或展開挑細項。',
+        en: 'Tap "🔍 Supplies · Stay · Sights" at the top-left of the map. Pick a big category, or expand it for details.',
+        zh: '點地圖左上角的「🔍 找補給・住宿・景點」。點大分類快速選，或展開挑細項。',
       },
       {
         en: 'When you select Accommodation, extra options appear: hotel, homestay, hostel and more.',

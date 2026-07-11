@@ -52,18 +52,30 @@ export function MapContainer() {
     });
     map.on('load', () => setLoadFailed(false));
 
-    // 隱藏底圖的紅色登山步道圖層（2026-07-11 Jimmy 指示）：
-    // outdoor 底圖的 trail_red / trail_longdistance（徒步路線）為紅色實線，
-    // 與本系統「紅色＝危險路段」的顏色語言衝突且不可點擊，易被誤認。
-    // 僅隱藏紅色系步道；其他顏色步道與粉紅自行車路網保留（對使用者有參考價值）。
-    const hideRedTrails = () => {
+    // 底圖圖層調校（2026-07-11 Jimmy 指示，初次載入與夜間換底圖後皆執行）：
+    // 1. 隱藏紅色登山步道（trail_red 等）——與「紅色＝危險路段」顏色語言衝突
+    // 2. 加粗自行車路網——「一打開就看到腳踏車路線」：
+    //    環島級（icn/ncn）與地方級（rcn/lcn）路網在低縮放就清楚可見
+    const tuneBaseLayers = () => {
       for (const layer of map.getStyle()?.layers ?? []) {
         if (/^(trail_red|trail_longdistance|viaferrata)/.test(layer.id)) {
           map.setLayoutProperty(layer.id, 'visibility', 'none');
         }
       }
+      if (map.getLayer('bicycle_longdistance')) {
+        map.setPaintProperty('bicycle_longdistance', 'line-width', {
+          stops: [[6, 2.2], [11, 3], [15, 5]],
+        });
+        map.setPaintProperty('bicycle_longdistance', 'line-opacity', 0.9);
+      }
+      if (map.getLayer('bicycle_local')) {
+        map.setPaintProperty('bicycle_local', 'line-width', {
+          base: 1,
+          stops: [[12, 1.2], [14, 2.4]],
+        });
+      }
     };
-    map.on('style.load', hideRedTrails); // 初次載入與夜間換底圖後皆執行
+    map.on('style.load', tuneBaseLayers);
 
     map.on('moveend', () => {
       const c = map.getCenter();

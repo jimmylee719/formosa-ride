@@ -26,11 +26,13 @@ export const POI_CATEGORY_GROUPS: CategoryGroup[] = [
     types: ['campsite_legal', 'campsite_wild', 'temple_overnight', 'accommodation'],
   },
   {
+    // 2026-07-11 Jimmy 指示：打氣站/單車停放區不顯示（腳踏車店即可涵蓋；
+    // 台灣到處可停車）。資料仍在 DB，只是 UI 不再提供。
     key: 'repair',
     icon: '🔧',
-    label_zh: '維修補給',
+    label_zh: '維修',
     label_en: 'Bike Repair',
-    types: ['bicycle_repair', 'pump_station', 'bicycle_parking'],
+    types: ['bicycle_repair'],
   },
   {
     key: 'safety',

@@ -101,7 +101,9 @@ export function POICard() {
           </p>
         )}
 
-      {poi.phone && (
+      {/* 景點不顯示電話（2026-07-11 Jimmy 指示：以官網為主，細節交給 Google Maps）；
+          醫院/修車店等功能型地點電話仍保留（旅途中直撥有實際價值） */}
+      {poi.phone && poi.type !== 'scenic_attraction' && (
         <a
           href={`tel:${poi.phone}`}
           className="tap-target mt-2 flex items-center gap-2 text-info-border underline"

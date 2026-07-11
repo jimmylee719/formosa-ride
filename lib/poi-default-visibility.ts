@@ -21,14 +21,21 @@ const TIER_MID: POIType[] = [
   'convenience_store',
   'supermarket',
   'water_station',
-  'pump_station',
   'police',
   'accommodation',
 ];
 
-/** zoom ≥ 14：全部顯示（含公廁等高密度類型） */
+/** zoom ≥ 14：全部（打氣站/單車停放區除外——2026-07-11 Jimmy 指示不顯示） */
+const TIER_NEAR: POIType[] = [
+  ...TIER_MID,
+  'campsite_wild',
+  'public_toilet',
+  'shower',
+  'restaurant',
+];
+
 export function defaultTypesForZoom(zoom: number): POIType[] | null {
-  if (zoom >= 14) return null; // null = 不限制類型
+  if (zoom >= 14) return TIER_NEAR;
   if (zoom >= 12) return TIER_MID;
   return TIER_FAR;
 }
