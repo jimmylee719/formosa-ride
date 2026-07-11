@@ -4,6 +4,7 @@
 // 地方自行車道在區域內再依縣市分組。跨縣市路線會出現在每個相關縣市下（利於探索）。
 import { useState } from 'react';
 import { RouteCard } from '@/components/route/RouteCard';
+import { COUNTY_EN, normalizeCounty as normalize } from '@/lib/county-en';
 import type { RouteListItem } from '@/types/route';
 
 type RegionKey = 'island' | 'north' | 'central' | 'south' | 'east' | 'islands';
@@ -26,43 +27,20 @@ const REGION_COUNTIES: Record<Exclude<RegionKey, 'island'>, string[]> = {
   islands: ['澎湖縣', '金門縣', '連江縣'],
 };
 
-const COUNTY_EN: Record<string, string> = {
-  台北市: 'Taipei',
-  新北市: 'New Taipei',
-  基隆市: 'Keelung',
-  桃園市: 'Taoyuan',
-  新竹市: 'Hsinchu City',
-  新竹縣: 'Hsinchu County',
-  苗栗縣: 'Miaoli',
-  台中市: 'Taichung',
-  彰化縣: 'Changhua',
-  南投縣: 'Nantou',
-  雲林縣: 'Yunlin',
-  嘉義市: 'Chiayi City',
-  嘉義縣: 'Chiayi County',
-  台南市: 'Tainan',
-  高雄市: 'Kaohsiung',
-  屏東縣: 'Pingtung',
-  宜蘭縣: 'Yilan',
-  花蓮縣: 'Hualien',
-  台東縣: 'Taitung',
-  澎湖縣: 'Penghu',
-  金門縣: 'Kinmen',
-  連江縣: 'Matsu (Lienchiang)',
-};
-
-/** 資料來源混用「臺／台」，統一為「台」再分組 */
-const normalize = (county: string) => county.replace(/^臺/, '台');
-
 export function RoutesBrowser({ routes }: { routes: RouteListItem[] }) {
   const [active, setActive] = useState<RegionKey>('island');
 
-  // 環島頁籤：主線 + 官方支線；其餘（custom）依縣市歸入區域
+  // 環島頁籤：主線 → 建議日段（2026-07-11）→ 官方支線；其餘（custom）依縣市歸入區域
+  const TYPE_ORDER: Record<string, number> = { full_island: 0, segment: 1 };
   const islandRoutes = routes
     .filter((r) => r.type !== 'custom')
     .sort((a, b) => {
-      if (a.type === 'full_island') return -1;
-      if (b.type === 'full_island') return 1;
+      const oa = TYPE_ORDER[a.type] ?? 2;
+      const ob = TYPE_ORDER[b.type] ?? 2;
+      if (oa !== ob) return oa - ob;
+      if (a.type === 'segment') {
+        return a.slug.localeCompare(b.slug, undefined, { numeric: true });
+      }
       return (a.official_route_code ?? '').localeCompare(b.official_route_code ?? '', 'zh-TW', {
         numeric: true,
       });

@@ -130,9 +130,12 @@ function WeatherContent() {
               <p className="mt-1 text-3xl font-bold">
                 {period.minT}–{period.maxT}°C
               </p>
-              <p className="info-primary">{period.wx}</p>
+              <p className="info-primary">
+                {period.wx_en ? `${period.wx_en} ` : ''}
+                <span className={period.wx_en ? 'text-neutral-text' : ''}>{period.wx}</span>
+              </p>
               <p className="info-secondary text-neutral-text">
-                ☔ 降雨機率 {period.pop}% · {period.comfort}
+                ☔ Rain 降雨機率 {period.pop}% · {period.comfort}
               </p>
             </div>
           )}
@@ -146,7 +149,12 @@ function WeatherContent() {
                   <span className="info-secondary w-14 shrink-0 font-bold">
                     {d.date.slice(5)}（{weekdayZh(d.date)}）
                   </span>
-                  <span className="info-secondary flex-1">{d.wx}</span>
+                  <span className="info-secondary flex-1">
+                    {d.wx_en ?? d.wx}
+                    {d.wx_en && (
+                      <span className="block text-sm text-neutral-text">{d.wx}</span>
+                    )}
+                  </span>
                   <span className="info-secondary w-16 text-right">
                     {d.minT ?? '–'}~{d.maxT ?? '–'}°
                   </span>

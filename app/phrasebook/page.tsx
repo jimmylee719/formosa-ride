@@ -61,6 +61,10 @@ export default function PhrasebookPage() {
                         </span>
                       )}
                     </span>
+                    {/* 日文輔助列（2026-07-11：日本旅客佔比高） */}
+                    {p.ja && (
+                      <span className="block text-sm text-neutral-text">🇯🇵 {p.ja}</span>
+                    )}
                   </button>
                   {speechOk && (
                     <button
@@ -99,6 +103,9 @@ export default function PhrasebookPage() {
           <p className="info-primary text-center text-neutral-text">
             {enlarged.en}
           </p>
+          {enlarged.ja && (
+            <p className="info-secondary text-center text-neutral-text">🇯🇵 {enlarged.ja}</p>
+          )}
           {enlarged.hint_zh && (
             <p className="info-secondary text-center text-neutral-text">
               👉 {enlarged.hint_zh} · {enlarged.hint_en}

@@ -58,7 +58,13 @@ export async function GET(req: NextRequest) {
 
   // Phase 4A / 15B：合併 RPC 未回傳的欄位（驗證統計、住宿子類型；Phase 9 改寫函數時一併收編）
   type RpcRow = { id: string; type: string } & Record<string, unknown>;
-  const rows = (data ?? []) as RpcRow[];
+  let rows = (data ?? []) as RpcRow[];
+  // limit（2026-07-11）：低縮放大半徑查詢時截前 N 筆（RPC 依距離排序，最近優先），
+  // 省流量也省合併查詢；未傳 limit 行為完全不變。
+  const limitRaw = Number(req.nextUrl.searchParams.get('limit'));
+  if (Number.isFinite(limitRaw) && limitRaw >= 1) {
+    rows = rows.slice(0, Math.min(limitRaw, 500));
+  }
   let pois: RpcRow[] = rows.map((r) => ({
     ...r,
     verification_count: 0,

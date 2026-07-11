@@ -110,13 +110,19 @@ export function DayInsights({ routeId, routeDistanceKm, county, dateISO, departT
             const res = await fetch(`/api/weather?county=${encodeURIComponent(toCwa(county as string))}`);
             if (res.ok) {
               const { next36h } = (await res.json()) as {
-                next36h: Array<{ wx: string; pop: number; minT: number; maxT: number }>;
+                next36h: Array<{
+                  wx: string;
+                  wx_en: string | null;
+                  pop: number;
+                  minT: number;
+                  maxT: number;
+                }>;
               };
               const f = next36h?.[0];
               if (f) {
                 push({
                   tone: f.pop >= 60 ? 'warn' : 'info',
-                  text: `🌦️ ${toCwa(county as string)}：${f.wx}，降雨 ${f.pop}%，${f.minT}–${f.maxT}°C${f.pop >= 60 ? '——記得帶雨具 bring rain gear' : ''}`,
+                  text: `🌦️ ${toCwa(county as string)}：${f.wx_en ? `${f.wx_en} ` : ''}${f.wx}，rain 降雨 ${f.pop}%，${f.minT}–${f.maxT}°C${f.pop >= 60 ? ' — bring rain gear 記得帶雨具' : ''}`,
                 });
               }
             }

@@ -4,6 +4,7 @@
 //   F-D0047-091 一週縣市預報（中文 ElementName，ElementValue 鍵名依元素而異）
 //   W-C0033-001 縣市天氣特報（hazardConditions.hazards[].info.phenomena）
 import 'server-only';
+import { wxToEn } from '@/lib/wx-en';
 
 const CWA_BASE = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore';
 
@@ -11,6 +12,8 @@ export interface CurrentPeriod {
   startTime: string;
   endTime: string;
   wx: string;
+  /** 英文天氣描述（2026-07-11，組合式翻譯；解析失敗為 null → 顯示端回退中文） */
+  wx_en: string | null;
   pop: number;
   minT: number;
   maxT: number;
@@ -20,6 +23,7 @@ export interface CurrentPeriod {
 export interface DailyForecast {
   date: string; // YYYY-MM-DD
   wx: string;
+  wx_en: string | null;
   pop: number;
   minT: number | null;
   maxT: number | null;
@@ -81,6 +85,7 @@ async function fetch36h(county: string): Promise<CurrentPeriod[]> {
     startTime: t.startTime,
     endTime: t.endTime,
     wx: t.parameter.parameterName,
+    wx_en: wxToEn(t.parameter.parameterName),
     pop: Number(pop[i]?.parameter.parameterName ?? 0),
     minT: Number(minT[i]?.parameter.parameterName ?? 0),
     maxT: Number(maxT[i]?.parameter.parameterName ?? 0),
@@ -121,6 +126,7 @@ async function fetchWeekly(county: string): Promise<DailyForecast[]> {
       d = {
         date,
         wx: '',
+        wx_en: null,
         pop: 0,
         minT: null,
         maxT: null,
@@ -150,7 +156,10 @@ async function fetchWeekly(county: string): Promise<DailyForecast[]> {
   for (const t of get('天氣現象')) {
     const d = ensure(dayOf(t));
     const wx = t.ElementValue[0]?.Weather ?? '';
-    if (!d.wx || isDaytime(t)) d.wx = wx;
+    if (!d.wx || isDaytime(t)) {
+      d.wx = wx;
+      d.wx_en = wxToEn(wx);
+    }
   }
   for (const t of get('12小時降雨機率')) {
     const v = Number(t.ElementValue[0]?.ProbabilityOfPrecipitation ?? NaN);

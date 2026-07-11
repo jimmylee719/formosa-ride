@@ -13,14 +13,16 @@ import type { POIRecord } from '@/types/poi';
 
 const MIN_POI_ZOOM = 10;
 const MAX_MARKERS = 200;
+const FETCH_LIMIT = 250; // 伺服器截前 N 筆（距離最近優先），低縮放大半徑不炸流量
 
-/** 依縮放層級決定查詢半徑（km） */
+/** 依縮放層級決定查詢半徑（km）；zoom<10 僅在使用者有篩選時會走到（50km＝API 上限） */
 function radiusForZoom(zoom: number): number {
   if (zoom >= 14) return 3;
   if (zoom >= 13) return 5;
   if (zoom >= 12) return 8;
   if (zoom >= 11) return 15;
-  return 25;
+  if (zoom >= 10) return 25;
+  return 50;
 }
 
 export function POILayer() {
@@ -76,7 +78,9 @@ export function POILayer() {
 
     const fetchPois = async () => {
       const zoom = map.getZoom();
-      if (zoom < MIN_POI_ZOOM) {
+      // 使用者有篩選 → 任何縮放都顯示（2026-07-11 Jimmy：選了景點不該還要放大才看得到）；
+      // 無篩選 → 維持 zoom ≥ 10 漸進顯示，避免預設狀態抓全台
+      if (activeTypes.length === 0 && zoom < MIN_POI_ZOOM) {
         clearMarkers();
         return;
       }
@@ -97,7 +101,7 @@ export function POILayer() {
           : '';
       try {
         const res = await fetch(
-          `/api/pois?lat=${c.lat.toFixed(5)}&lng=${c.lng.toFixed(5)}&radius=${radiusForZoom(zoom)}${typesParam}${subtypesParam}`,
+          `/api/pois?lat=${c.lat.toFixed(5)}&lng=${c.lng.toFixed(5)}&radius=${radiusForZoom(zoom)}&limit=${FETCH_LIMIT}${typesParam}${subtypesParam}`,
           { signal: controller.signal }
         );
         if (!res.ok) throw new Error(String(res.status));
