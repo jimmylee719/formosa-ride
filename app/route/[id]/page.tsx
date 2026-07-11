@@ -8,7 +8,7 @@ import { RouteDetailMap } from '@/components/route/RouteDetailMap';
 import { ElevationProfile } from '@/components/route/ElevationProfile';
 import { OfflineDownloadButton } from '@/components/route/OfflineDownloadButton';
 import { getRoute } from '@/lib/route-queries';
-import { createAnonServerClient } from '@/lib/supabase-server';
+import { getPoisAlongRoute } from '@/lib/pois-along-route';
 import { DIFFICULTY_LABELS, ROUTE_TYPE_LABELS } from '@/types/route';
 import { POI_ICONS, POI_LABELS } from '@/lib/poi-icons';
 import type { POIType } from '@/types/poi';
@@ -55,19 +55,18 @@ export default async function RouteDetailPage({
   if (!route) notFound();
 
   // 沿線 POI（3km 緩衝，v1.0 §7.4）
-  // 超長路線（>150km，如環島1號線 939km）緩衝查詢會逾時且結果達數千筆無閱讀價值，
-  // 改引導使用者在主地圖沿途查看（Phase 15A）
+  // 超長路線（>150km，如環島1號線 939km）外框≈全台、無閱讀價值 → 引導至主地圖（Phase 15A）
+  // 2026-07-11：改用 lib/pois-along-route（bbox+Node 投影），~105km 日段從 ~5s 降至 ~1.5s
   const tooLongForAlongPois = Number(route.distance_km) > 150;
   let pois: AlongPoi[] = [];
+  let poiTotal = 0;
   if (!tooLongForAlongPois) {
-    const supabase = createAnonServerClient();
-    const { data: alongPois } = await supabase.rpc('get_pois_along_route', {
-      p_route_id: id,
-      p_buffer_km: 3,
-      p_types: null,
-      p_free_tier_only: false,
+    const { pois: found, total } = await getPoisAlongRoute(route.geometry, {
+      bufferKm: 3,
+      limit: 12,
     });
-    pois = (alongPois ?? []) as AlongPoi[];
+    pois = found.map((p) => ({ id: p.id, name_zh: p.name_zh, type: p.type as POIType }));
+    poiTotal = total;
   }
 
   const typeLabel = ROUTE_TYPE_LABELS[route.type];
@@ -191,7 +190,7 @@ export default async function RouteDetailPage({
             </p>
           ) : (
             <ul className="mt-2 divide-y divide-neutral-border">
-              {pois.slice(0, 12).map((p) => (
+              {pois.map((p) => (
                 <li key={p.id} className="flex items-center gap-2 py-2">
                   <span aria-hidden>{POI_ICONS[p.type]}</span>
                   <span className="info-secondary flex-1">{p.name_zh}</span>
@@ -202,9 +201,9 @@ export default async function RouteDetailPage({
               ))}
             </ul>
           )}
-          {pois.length > 12 && (
+          {poiTotal > pois.length && (
             <p className="info-secondary mt-2 text-neutral-text">
-              …等共 {pois.length} 個地點
+              …等共 {poiTotal} 個地點 · and {poiTotal} places in total
             </p>
           )}
         </section>
