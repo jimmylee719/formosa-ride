@@ -23,6 +23,7 @@ import { crossedMilestone, countyChangeMessage } from '@/lib/milestones';
 import { nearestCounty } from '@/lib/taiwan-counties';
 import { POI_ICONS } from '@/lib/poi-icons';
 import { ShareModal } from '@/components/mobile/ShareModal';
+import { MarkModal } from '@/components/mobile/MarkModal';
 import type { POIRecord } from '@/types/poi';
 
 const TRAIL_SOURCE = 'journey-trail';
@@ -38,6 +39,7 @@ export function JourneyHUD() {
   const [toast, setToast] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [markOpen, setMarkOpen] = useState(false);
   const [planDay, setPlanDay] = useState<ActivePlanDay | null>(null);
   const trailRef = useRef<[number, number][]>([]);
   const drawTrailRef = useRef<(() => void) | null>(null);
@@ -211,26 +213,29 @@ export function JourneyHUD() {
     setBusy(false);
   };
 
-  const handleMarkPoint = async () => {
+  const handleMarkPoint = () => {
     if (!stats) return;
-    const last = trailRef.current[trailRef.current.length - 1];
-    if (!last) {
+    if (!trailRef.current[trailRef.current.length - 1]) {
       showToast('尚未取得位置 · No position yet');
       return;
     }
-    const note = window.prompt('為這個地點加個備註（可留空）\nAdd a note (optional):') ?? '';
+    setMarkOpen(true);
+  };
+
+  // 照片牆（v2.0 C4）：備註＋照片以 multipart 送出
+  const saveMark = async (note: string, photo: Blob | null) => {
+    if (!stats) return;
+    const last = trailRef.current[trailRef.current.length - 1];
+    if (!last) return;
     try {
-      const res = await fetch('/api/trips/checkpoint', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          deviceId: getDeviceId(),
-          tripId: stats.tripId,
-          lat: last[1],
-          lng: last[0],
-          note,
-        }),
-      });
+      const fd = new FormData();
+      fd.set('deviceId', getDeviceId());
+      fd.set('tripId', stats.tripId);
+      fd.set('lat', String(last[1]));
+      fd.set('lng', String(last[0]));
+      fd.set('note', note);
+      if (photo) fd.set('photo', photo, 'photo.jpg');
+      const res = await fetch('/api/trips/checkpoint', { method: 'POST', body: fd });
       showToast(res.ok ? '📌 已標記！Marked!' : '⚠️ 標記失敗，稍後再試');
     } catch {
       showToast('⚠️ 離線中，標記失敗');
@@ -406,6 +411,9 @@ export function JourneyHUD() {
             </div>
             {shareOpen && (
               <ShareModal tripId={stats.tripId} onClose={() => setShareOpen(false)} />
+            )}
+            {markOpen && (
+              <MarkModal onSave={saveMark} onClose={() => setMarkOpen(false)} />
             )}
           </div>
         )}

@@ -186,24 +186,48 @@ export default function TripSummaryPage() {
               </ul>
             </section>
 
-            {/* 標記點（照片牆：照片上傳於後續版本，先列備註） */}
+            {/* 標記點照片牆（v8.0 B2 / v2.0 C4，2026-07-11 照片上線） */}
             {data.checkpoints.length > 0 && (
               <section className="mt-3 rounded-2xl bg-white p-4">
                 <h2 className="info-primary font-bold">
-                  📌 標記的地點（{data.checkpoints.length}）
+                  📌 Marked spots 標記的地點（{data.checkpoints.length}）
                 </h2>
+                {/* 有照片的排成照片牆 */}
+                {data.checkpoints.some((c) => c.photo_url) && (
+                  <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {data.checkpoints
+                      .filter((c) => c.photo_url)
+                      .map((c) => (
+                        <figure key={c.id} className="overflow-hidden rounded-xl">
+                          {/* eslint-disable-next-line @next/next/no-img-element -- Supabase Storage 外部圖 */}
+                          <img
+                            src={c.photo_url as string}
+                            alt={c.note || 'Trip photo 旅程照片'}
+                            loading="lazy"
+                            className="aspect-square w-full object-cover"
+                          />
+                          {c.note && (
+                            <figcaption className="truncate p-1 text-sm text-neutral-text">
+                              {c.note}
+                            </figcaption>
+                          )}
+                        </figure>
+                      ))}
+                  </div>
+                )}
+                {/* 無照片的維持文字列表 */}
                 <ul className="mt-2 divide-y divide-neutral-border">
-                  {data.checkpoints.map((c) => (
-                    <li key={c.id} className="py-2">
-                      <p className="info-secondary">
-                        {c.note || '（無備註）'}
-                      </p>
-                      <p className="text-sm text-neutral-text">
-                        {new Date(c.marked_at).toLocaleString('zh-TW')} ·{' '}
-                        {Number(c.lat).toFixed(4)}, {Number(c.lng).toFixed(4)}
-                      </p>
-                    </li>
-                  ))}
+                  {data.checkpoints
+                    .filter((c) => !c.photo_url)
+                    .map((c) => (
+                      <li key={c.id} className="py-2">
+                        <p className="info-secondary">{c.note || '（無備註）'}</p>
+                        <p className="text-sm text-neutral-text">
+                          {new Date(c.marked_at).toLocaleString('zh-TW')} ·{' '}
+                          {Number(c.lat).toFixed(4)}, {Number(c.lng).toFixed(4)}
+                        </p>
+                      </li>
+                    ))}
                 </ul>
               </section>
             )}
