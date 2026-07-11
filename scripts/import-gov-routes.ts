@@ -93,10 +93,12 @@ interface RouteRow {
 }
 
 async function upsertRoutes(rows: RouteRow[]): Promise<void> {
-  for (let i = 0; i < rows.length; i += 100) {
+  // routes 表無 updated_at 自動觸發器 → 匯入時明確蓋時間戳，月更才可稽核
+  const stamped = rows.map((r) => ({ ...r, updated_at: new Date().toISOString() }));
+  for (let i = 0; i < stamped.length; i += 100) {
     const { error } = await supabase
       .from('routes')
-      .upsert(rows.slice(i, i + 100), { onConflict: 'slug' });
+      .upsert(stamped.slice(i, i + 100), { onConflict: 'slug' });
     if (error) throw new Error(`upsert 失敗：${error.message}`);
   }
 }
