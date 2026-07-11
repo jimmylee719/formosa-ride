@@ -4,6 +4,7 @@ import { Header } from '@/components/ui/Header';
 import { BottomNavBar } from '@/components/mobile/BottomNavBar';
 import { FooterLinks } from '@/components/ui/FooterLinks';
 import { PlanList } from '@/components/plan/PlanList';
+import { StarterItineraries } from '@/components/plan/StarterItineraries';
 
 export const metadata = {
   title: 'Trip Planner 旅程規劃',
@@ -22,6 +23,7 @@ export default function PlanPage() {
           <br />
           出發前把每一天排好——停靠點、住宿、出發時間。
         </p>
+        <StarterItineraries />
         <PlanList />
         <FooterLinks />
       </main>

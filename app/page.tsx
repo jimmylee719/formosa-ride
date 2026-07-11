@@ -17,6 +17,7 @@ import { DangerWarningCard } from '@/components/mobile/DangerWarningCard';
 import { JourneyHUD } from '@/components/mobile/JourneyHUD';
 import { OfflineBadge } from '@/components/mobile/OfflineBadge';
 import { InstallSuggestionBanner } from '@/components/mobile/InstallSuggestionBanner';
+import { NewcomerBanner } from '@/components/mobile/NewcomerBanner';
 
 export default function HomePage() {
   return (
@@ -41,6 +42,7 @@ export default function HomePage() {
         {/* 溝通小卡入口移至 SOS 頁（2026-07-11 Jimmy 指示：FAB 擋住地圖） */}
         <OfflineBadge />
         <BannerQueue />
+        <NewcomerBanner />
         <JourneyHUD />
         <POICard />
         <DangerWarningCard />
