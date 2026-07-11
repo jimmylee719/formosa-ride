@@ -1,0 +1,52 @@
+# 每月資料自動更新（2026-07-11 Jimmy 指示）
+# 每月 1 日 19:00 UTC（台北 2 日凌晨 03:00）自動執行：
+#   1. OSM POI（便利商店、飲水、廁所、修車行等 10 類，upsert 不刪除）
+#   2. 觀光署合法旅宿名冊（旅館/民宿，含住宿子類型）
+#   3. 政府自行車路線（環島路網 + 內政部地方車道）
+#   4. 新路線海拔預先計算（已有海拔的路線自動略過）
+# 事故熱點資料警政署一年才發布一次，不在此排程（年度手動更新）。
+# 需要的 repo secrets（Settings → Secrets and variables → Actions）：
+#   NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY /
+#   NEXT_PUBLIC_MAP_PROVIDER_BASE_URL / NEXT_PUBLIC_MAP_PROVIDER_KEY
+# ⚠️ 公開 repo：secrets 只在排程與手動觸發時可用，fork PR 拿不到，安全。
+name: Monthly data refresh
+
+on:
+  schedule:
+    - cron: '0 19 1 * *'
+  workflow_dispatch: # 也可在 GitHub Actions 頁面手動觸發
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_MAP_PROVIDER_BASE_URL: ${{ secrets.NEXT_PUBLIC_MAP_PROVIDER_BASE_URL }}
+      NEXT_PUBLIC_MAP_PROVIDER_KEY: ${{ secrets.NEXT_PUBLIC_MAP_PROVIDER_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: 1/4 OSM POIs（Overpass API）
+        run: npx tsx scripts/import-osm-pois.ts
+
+      - name: 2/4 觀光署合法旅宿
+        run: npx tsx scripts/import-hotels.ts
+
+      - name: 3/4 政府自行車路線
+        run: npx tsx scripts/import-gov-routes.ts
+
+      - name: 4/4 新路線海拔計算
+        run: npx tsx scripts/precompute-elevation.ts
