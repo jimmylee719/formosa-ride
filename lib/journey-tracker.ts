@@ -4,8 +4,6 @@
 // 開發模擬：dev 環境下 window.__journeySimulate(lat, lng, speedKmh) 可注入位置。
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import { getDeviceId } from '@/lib/device-id';
-import { metForRide } from '@/lib/calories';
-import { getRiderWeightKg } from '@/lib/rider-weight';
 
 export interface TrackedPoint {
   id?: number;
@@ -27,7 +25,6 @@ export interface ActiveTrip {
   totalDistanceKm: number;
   ridingMs: number;
   restMs: number;
-  calories: number;
   lastLat: number | null;
   lastLng: number | null;
 }
@@ -37,7 +34,6 @@ export interface JourneyStats {
   totalDistanceKm: number;
   ridingMinutes: number;
   restMinutes: number;
-  calories: number;
   currentSpeedKmh: number;
   isResting: boolean;
   headingDeg: number | null;
@@ -56,7 +52,6 @@ const MOVING_INTERVAL_MS = 30_000; // 移動中 30 秒記一點（v2.0）
 const STATIC_INTERVAL_MS = 120_000; // 靜止時 2 分鐘記一點
 const MIN_SPEED_KMH = 2; // 低於 2km/h 視為靜止
 const SYNC_BATCH = 200;
-const GRADE_WINDOW_KM = 0.1; // 坡度計算距離窗（GPS 海拔噪音需要 ≥100m 平滑）
 
 function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number): number {
   const R = 6371;
@@ -93,9 +88,6 @@ class JourneyTracker {
   private lastMoveAt = 0;
   private currentSpeedKmh = 0;
   private headingDeg: number | null = null;
-  // 即時坡度（Phase 19A）：GPS 海拔以 ≥100m 距離窗計算，供雙因子 MET 卡路里
-  private gradeAnchor: { distKm: number; ele: number } | null = null;
-  private currentGradePct: number | null = null;
   private restDetectMs = 5 * 60_000; // 靜止 5 分鐘 → 休息（?fastrest=1 時縮短，QA 用）
   private syncing = false; // 互斥鎖：防止並發同步重複上傳同一批點
   private listeners = new Set<Listener>();
@@ -139,7 +131,6 @@ class JourneyTracker {
       totalDistanceKm: Math.round(this.trip.totalDistanceKm * 100) / 100,
       ridingMinutes: Math.round(this.trip.ridingMs / 60_000),
       restMinutes: Math.round(this.trip.restMs / 60_000),
-      calories: Math.round(this.trip.calories),
       currentSpeedKmh: Math.round(this.currentSpeedKmh * 10) / 10,
       isResting: this.isResting,
       headingDeg: this.headingDeg,
@@ -163,8 +154,6 @@ class JourneyTracker {
   async start(resumeTripId?: string): Promise<string> {
     await this.init();
     if (this.trip && this.trip.status === 'active') return this.trip.tripId;
-    this.gradeAnchor = null;
-    this.currentGradePct = null;
     if (!this.trip) {
       this.trip = {
         tripId: resumeTripId ?? crypto.randomUUID(),
@@ -173,7 +162,6 @@ class JourneyTracker {
         totalDistanceKm: 0,
         ridingMs: 0,
         restMs: 0,
-        calories: 0,
         lastLat: null,
         lastLng: null,
       };
@@ -238,9 +226,6 @@ class JourneyTracker {
       if (this.lastMoveAt > 0) {
         const dt = Math.min(now - this.lastMoveAt, 5 * 60_000);
         this.trip.ridingMs += dt;
-        // 雙因子 MET（速度＋坡度，Phase 19A）×用戶設定體重（預設 70kg）
-        this.trip.calories +=
-          (metForRide(speedKmh, this.currentGradePct) * getRiderWeightKg() * dt) / 3600_000;
       }
       this.lastMoveAt = now;
     } else {
@@ -277,20 +262,6 @@ class JourneyTracker {
     }
     this.trip.lastLat = lat;
     this.trip.lastLng = lng;
-
-    // 坡度更新（Phase 19A）：每累積 ≥100m 距離以海拔差重算，夾限 ±20% 防噪音
-    if (elevation != null) {
-      if (!this.gradeAnchor) {
-        this.gradeAnchor = { distKm: this.trip.totalDistanceKm, ele: elevation };
-      } else {
-        const dKm = this.trip.totalDistanceKm - this.gradeAnchor.distKm;
-        if (dKm >= GRADE_WINDOW_KM) {
-          const raw = ((elevation - this.gradeAnchor.ele) / (dKm * 1000)) * 100;
-          this.currentGradePct = Math.max(-20, Math.min(20, raw));
-          this.gradeAnchor = { distKm: this.trip.totalDistanceKm, ele: elevation };
-        }
-      }
-    }
 
     const point: TrackedPoint = {
       tripId: this.trip.tripId,
@@ -398,7 +369,6 @@ class JourneyTracker {
           distanceKm: Math.round(trip.totalDistanceKm * 100) / 100,
           ridingMinutes: Math.round(trip.ridingMs / 60_000),
           restMinutes: Math.round(trip.restMs / 60_000),
-          calories: Math.round(trip.calories),
         }),
       });
       ok = res.ok;
@@ -453,7 +423,6 @@ class JourneyTracker {
         totalDistanceKm: 0,
         ridingMinutes: 0,
         restMinutes: 0,
-        calories: 0,
         currentSpeedKmh: 0,
         isResting: false,
         headingDeg: null,
@@ -499,8 +468,6 @@ class JourneyTracker {
     this.isResting = false;
     this.currentSpeedKmh = 0;
     this.headingDeg = null;
-    this.gradeAnchor = null;
-    this.currentGradePct = null;
   }
 }
 

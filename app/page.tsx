@@ -39,7 +39,6 @@ export default function HomePage() {
         <NightWarningLayer />
         <DangerZoneLayer />
         <MapFAB />
-        {/* 溝通小卡入口移至 SOS 頁（2026-07-11 Jimmy 指示：FAB 擋住地圖） */}
         <OfflineBadge />
         <BannerQueue />
         <NewcomerBanner />

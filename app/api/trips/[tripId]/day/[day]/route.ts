@@ -34,7 +34,7 @@ export async function GET(
   const { data: summary } = await supabase
     .from('trip_day_summaries')
     .select(
-      'day_number, date, distance_km, riding_minutes, rest_minutes, calories, max_elevation'
+      'day_number, date, distance_km, riding_minutes, rest_minutes, max_elevation'
     )
     .eq('trip_id', tripId)
     .eq('day_number', dayNumber)

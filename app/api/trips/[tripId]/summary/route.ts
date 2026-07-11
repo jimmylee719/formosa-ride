@@ -30,7 +30,7 @@ export async function GET(
     supabase.rpc('get_trip_summary', { p_trip_id: tripId }),
     supabase
       .from('trip_day_summaries')
-      .select('day_number, date, distance_km, riding_minutes, rest_minutes, calories, max_elevation')
+      .select('day_number, date, distance_km, riding_minutes, rest_minutes, max_elevation')
       .eq('trip_id', tripId)
       .order('day_number', { ascending: true }),
     supabase

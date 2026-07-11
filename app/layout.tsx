@@ -108,7 +108,6 @@ const jsonLd = {
         'Offline map support',
         'POI: campsites, repair shops, convenience stores, lodging',
         'GPS trip recording',
-        'Bilingual phrasebook (Chinese/English)',
         'Works for cycling and walking round-island trips',
       ],
     },

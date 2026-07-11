@@ -11,7 +11,6 @@ export async function POST(req: NextRequest) {
     distanceKm?: number;
     ridingMinutes?: number;
     restMinutes?: number;
-    calories?: number;
   };
   try {
     body = await req.json();
@@ -25,9 +24,8 @@ export async function POST(req: NextRequest) {
   const distanceKm = Number(body.distanceKm ?? 0);
   const ridingMinutes = Number(body.ridingMinutes ?? 0);
   const restMinutes = Number(body.restMinutes ?? 0);
-  const calories = Number(body.calories ?? 0);
   if (
-    [distanceKm, ridingMinutes, restMinutes, calories].some(
+    [distanceKm, ridingMinutes, restMinutes].some(
       (n) => !Number.isFinite(n) || n < 0 || n > 100000
     )
   ) {
@@ -37,7 +35,7 @@ export async function POST(req: NextRequest) {
   const supabase = createServiceClient();
   const { data: trip } = await supabase
     .from('trips')
-    .select('id, device_id, total_distance_km, total_time_minutes, total_calories')
+    .select('id, device_id, total_distance_km, total_time_minutes')
     .eq('id', tripId)
     .maybeSingle();
   if (!trip) return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
@@ -79,7 +77,6 @@ export async function POST(req: NextRequest) {
     distance_km: distanceKm,
     riding_minutes: ridingMinutes,
     rest_minutes: restMinutes,
-    calories,
     max_elevation: maxElev,
     start_point: first ? `SRID=4326;POINT(${first.lng} ${first.lat})` : null,
     end_point: last ? `SRID=4326;POINT(${last.lng} ${last.lat})` : null,
@@ -94,7 +91,6 @@ export async function POST(req: NextRequest) {
     .update({
       total_distance_km: Number(trip.total_distance_km ?? 0) + distanceKm,
       total_time_minutes: Number(trip.total_time_minutes ?? 0) + ridingMinutes,
-      total_calories: Number(trip.total_calories ?? 0) + calories,
       status: 'paused', // 多日旅程：隔天可續；「結束旅程」於 Phase 11C
     })
     .eq('id', tripId);

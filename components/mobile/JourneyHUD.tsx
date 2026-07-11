@@ -327,16 +327,12 @@ export function JourneyHUD() {
 
         {expanded && (
           <div className="border-t border-neutral-border px-4 pb-4 pt-2">
-            <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="grid grid-cols-2 gap-2 text-center">
               <div>
                 <p className="text-xl font-bold text-primary">
                   {Math.floor(stats.ridingMinutes / 60)}:{String(stats.ridingMinutes % 60).padStart(2, '0')}
                 </p>
                 <p className="text-sm text-neutral-text">riding 騎乘</p>
-              </div>
-              <div>
-                <p className="text-xl font-bold text-accent">{stats.calories}</p>
-                <p className="text-sm text-neutral-text">🔥 kcal</p>
               </div>
               <div>
                 <p className="text-xl font-bold text-info-border">{stats.restMinutes}</p>

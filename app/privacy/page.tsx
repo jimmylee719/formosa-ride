@@ -80,7 +80,7 @@ export default function PrivacyPage() {
 
           <H2>3. How We Use Your Data 資料使用目的</H2>
           <ul className="mt-1 list-disc pl-5 text-neutral-text">
-            <li>提供服務：路線、地點、天氣、卡路里計算、行程記錄</li>
+            <li>提供服務：路線、地點、天氣、行程記錄</li>
             <li>服務通知與回饋處理</li>
             <li>匿名分析以改善平台功能</li>
             <li>防止濫用與不當存取</li>

@@ -13,7 +13,6 @@ interface Totals {
   total_days: number;
   total_distance_km: number;
   total_ascent_m: number;
-  total_calories: number;
   total_riding_minutes: number;
   counties_visited: string[] | null;
   checkpoint_count: number;
@@ -26,7 +25,6 @@ interface DayRow {
   date: string;
   distance_km: number;
   riding_minutes: number;
-  calories: number;
 }
 
 interface Checkpoint {
@@ -126,9 +124,9 @@ export default function TripSummaryPage() {
                 </div>
                 <div className="rounded-xl bg-danger-bg p-4 text-center">
                   <p className="text-3xl font-bold text-danger-text">
-                    {Math.round(Number(t.total_calories)).toLocaleString()}
+                    {(Number(t.total_riding_minutes) / 60).toFixed(1)}
                   </p>
-                  <p className="info-secondary text-danger-text">總消耗 kcal</p>
+                  <p className="info-secondary text-danger-text">總騎乘 hours 小時</p>
                 </div>
               </div>
 

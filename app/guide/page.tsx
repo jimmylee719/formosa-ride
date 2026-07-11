@@ -1,7 +1,7 @@
 // /guide — 使用說明（Phase 16C，v10.0 A 節）
 // 依 2026-07-10 Jimmy 指示：直接的功能說明，不採用「旅程故事」敘事。
 // 寫作原則維持 v10 A1：句子短、無術語、大 emoji 視覺錨點；英文為主中文為輔。
-// 純靜態頁（同 /phrasebook 做法），Phase 17 Serwist 預先快取後離線可讀。
+// 純靜態頁，Phase 17 Serwist 預先快取後離線可讀。
 import Link from 'next/link';
 import { Header } from '@/components/ui/Header';
 import { BottomNavBar } from '@/components/mobile/BottomNavBar';
@@ -111,8 +111,8 @@ const SECTIONS: Section[] = [
     title_zh: '旅途模式',
     body: [
       {
-        en: 'Tap "Start Journey" on the map. The app records distance, speed, time and calories.',
-        zh: '點地圖上的「Start Journey」。系統記錄距離、速度、時間與卡路里。',
+        en: 'Tap "Start Journey" on the map. The app records distance, speed and time.',
+        zh: '點地圖上的「Start Journey」。系統記錄距離、速度與時間。',
       },
       {
         en: 'Share: send a link so family can watch your live location. Mark: save a spot you like.',
@@ -136,21 +136,6 @@ const SECTIONS: Section[] = [
       {
         en: 'Before mountain sections, open a route page and tap "Download". Places along the route stay available without signal.',
         zh: '進山區前，到路線頁點「Download 下載離線包」。沒訊號也查得到沿線地點。',
-      },
-    ],
-  },
-  {
-    icon: '💬',
-    title_en: 'Phrasebook',
-    title_zh: '溝通小卡',
-    body: [
-      {
-        en: 'Inside the SOS page (hold the SOS button 2 seconds). If someone does not understand you, open a card, tap to enlarge, and show them.',
-        zh: '在 SOS 頁面裡（長按 SOS 按鈕 2 秒）。對方聽不懂時，打開小卡、點一下放大，直接拿給對方看。',
-      },
-      {
-        en: 'Tap 🔊 to play the Chinese audio.',
-        zh: '點 🔊 可播放中文發音。',
       },
     ],
   },
@@ -180,15 +165,15 @@ const SECTIONS: Section[] = [
       },
     ],
   },
-  // 徒步環島（2026-07-11）：補給/天氣/住宿/安全/溝通小卡對徒步者同樣適用
+  // 徒步環島（2026-07-11）：補給/天氣/住宿/安全資訊對徒步者同樣適用
   {
     icon: '🚶',
     title_en: 'Walking around Taiwan?',
     title_zh: '徒步環島？',
     body: [
       {
-        en: 'This app works for round-island walkers too. Supplies, water, toilets, lodging, weather, sunset alerts, the phrasebook and SOS are all just as useful on foot.',
-        zh: '這個 App 對徒步環島同樣好用。補給、飲水、廁所、住宿、天氣、日落提醒、溝通小卡和 SOS，走路環島一樣用得上。',
+        en: 'This app works for round-island walkers too. Supplies, water, toilets, lodging, weather, sunset alerts and SOS are all just as useful on foot.',
+        zh: '這個 App 對徒步環島同樣好用。補給、飲水、廁所、住宿、天氣、日落提醒和 SOS，走路環島一樣用得上。',
       },
       {
         en: 'Journey Mode records walking trips the same way — distance, time and daily summaries.',
@@ -228,14 +213,14 @@ const FAQ: Array<{ q_en: string; q_zh: string; a_en: string; a_zh: string }> = [
   {
     q_en: 'Do I need to speak Chinese?',
     q_zh: '需要會講中文嗎？',
-    a_en: 'No. The app is English-first with Chinese alongside. If someone cannot understand you, open the bilingual phrasebook (inside the SOS page), tap to enlarge a card, and show it.',
-    a_zh: '不用。介面英文為主、中文為輔。對方聽不懂時，打開雙語溝通小卡（在 SOS 頁裡），點一下放大直接給對方看。',
+    a_en: 'No. The app is English-first with Chinese alongside, so you can use everything in English. A translation app on your phone covers the rare moments you need to talk to locals.',
+    a_zh: '不用。介面英文為主、中文為輔，全程用英文就能操作。少數需要跟當地人溝通的時候，手機的翻譯 App 就夠用。',
   },
   {
     q_en: 'Can I do a round-island trip on foot instead of by bike?',
     q_zh: '可以徒步環島而不是騎車嗎？',
-    a_en: 'Yes. Supplies, water, toilets, lodging, weather, sunset alerts, the phrasebook and SOS all work the same on foot, and Journey Mode records walking trips too.',
-    a_zh: '可以。補給、飲水、廁所、住宿、天氣、日落提醒、溝通小卡與 SOS 徒步一樣適用，旅途模式也能記錄步行旅程。',
+    a_en: 'Yes. Supplies, water, toilets, lodging, weather, sunset alerts and SOS all work the same on foot, and Journey Mode records walking trips too.',
+    a_zh: '可以。補給、飲水、廁所、住宿、天氣、日落提醒與 SOS 徒步一樣適用，旅途模式也能記錄步行旅程。',
   },
   {
     q_en: 'How do I plan my whole trip in the app?',

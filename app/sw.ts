@@ -35,10 +35,9 @@ const serwist = new Serwist({
       }),
     },
     {
-      // 溝通小卡 + 使用說明：強制快取優先，離線必可開
-      // （v7.0 B4：最需要小卡的時刻正是訊號最差的山區；v10.0 A4 同樣建議 guide）
-      matcher: /\/(phrasebook|guide)$/,
-      handler: new CacheFirst({ cacheName: 'phrasebook-cache' }),
+      // 使用說明：強制快取優先，離線必可開（v10.0 A4：山區訊號差時仍要能查）
+      matcher: /\/guide$/,
+      handler: new CacheFirst({ cacheName: 'guide-cache' }),
     },
     ...defaultCache,
   ],

@@ -7,7 +7,6 @@ import { BottomNavBar } from '@/components/mobile/BottomNavBar';
 import { ActiveAlertsList } from '@/components/mobile/ActiveAlertsList';
 import { FooterLinks } from '@/components/ui/FooterLinks';
 import { InstallAppButton } from '@/components/ui/InstallAppButton';
-import { WeightSetting } from '@/components/profile/WeightSetting';
 
 export default function ProfilePage() {
   return (
@@ -21,15 +20,6 @@ export default function ProfilePage() {
         <div className="w-full">
           <InstallAppButton />
         </div>
-        {/* 體重設定（Phase 19A）：騎行卡路里估算用 */}
-        <WeightSetting />
-        <Link
-          href="/phrasebook"
-          className="tap-target flex w-full items-center justify-between rounded-2xl bg-white p-4"
-        >
-          <span className="info-primary font-bold">💬 Phrasebook 溝通小卡</span>
-          <span aria-hidden>›</span>
-        </Link>
         <Link
           href="/feedback"
           className="tap-target flex w-full items-center justify-between rounded-2xl bg-white p-4"

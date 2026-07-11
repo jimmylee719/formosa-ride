@@ -14,7 +14,6 @@ interface DaySummary {
   distance_km: number;
   riding_minutes: number;
   rest_minutes: number;
-  calories: number;
   max_elevation: number | null;
 }
 
@@ -90,10 +89,6 @@ export default function DaySummaryPage() {
                   {summary.rest_minutes} m
                 </p>
                 <p className="info-secondary text-neutral-text">休息時間 rest</p>
-              </div>
-              <div className="rounded-xl bg-white p-4 text-center">
-                <p className="text-2xl font-bold text-accent">{summary.calories}</p>
-                <p className="info-secondary text-neutral-text">🔥 消耗大卡 kcal</p>
               </div>
               <div className="rounded-xl bg-white p-4 text-center">
                 <p className="text-2xl font-bold text-safe-text">
