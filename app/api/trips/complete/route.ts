@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase-server';
 import { evaluateTripAchievements } from '@/lib/achievements-eval';
+import { evaluateTripCounties } from '@/lib/counties';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
   let achievements: {
     newlyEarned: string[];
     landmarks: string[];
+    counties: string[];
     certificate: boolean;
   } | null = null;
   try {
@@ -56,13 +58,14 @@ export async function POST(req: NextRequest) {
       tripId,
       Number(trip.total_distance_km ?? 0)
     );
+    const countyAwards = await evaluateTripCounties(supabase, tripId);
 
     // 既有徽章（同裝置）→ 判斷哪些是本趟「新獲得」，供前端慶祝
     const { data: existing } = await supabase
       .from('achievements')
       .select('type, key')
       .eq('device_id', deviceId)
-      .in('type', ['landmark', 'certificate']);
+      .in('type', ['landmark', 'certificate', 'county']);
     const had = new Set(
       (existing ?? []).map((r) => `${r.type}:${r.key}`)
     );
@@ -76,6 +79,17 @@ export async function POST(req: NextRequest) {
       proof_lng: l.proof.lng,
       proof_at: l.proof.recorded_at ?? null,
     }));
+    for (const c of countyAwards) {
+      rows.push({
+        device_id: deviceId,
+        type: 'county',
+        key: c.county,
+        trip_id: tripId,
+        proof_lat: c.proof.lat,
+        proof_lng: c.proof.lng,
+        proof_at: c.proof.recorded_at ?? null,
+      });
+    }
     if (evalResult.roundIsland.passed) {
       rows.push({
         device_id: deviceId,
@@ -86,6 +100,7 @@ export async function POST(req: NextRequest) {
         proof_at: now.toISOString(),
         meta: {
           landmarks: evalResult.landmarks.map((l) => l.id),
+          counties: countyAwards.map((c) => c.county),
           loop_close_km: evalResult.roundIsland.loop_close_km,
           lat_span_km: Math.round(evalResult.roundIsland.lat_span_km),
         },
@@ -103,6 +118,7 @@ export async function POST(req: NextRequest) {
     achievements = {
       newlyEarned: awardedKeys.filter((k) => !had.has(k)),
       landmarks: evalResult.landmarks.map((l) => l.id),
+      counties: countyAwards.map((c) => c.county),
       certificate: evalResult.roundIsland.passed,
     };
   } catch (err) {
