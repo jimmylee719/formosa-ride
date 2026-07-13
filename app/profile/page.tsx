@@ -21,6 +21,13 @@ export default function ProfilePage() {
           <InstallAppButton />
         </div>
         <Link
+          href="/achievements"
+          className="tap-target flex w-full items-center justify-between rounded-2xl bg-white p-4"
+        >
+          <span className="info-primary font-bold">🏅 Achievements 環島認證</span>
+          <span aria-hidden>›</span>
+        </Link>
+        <Link
           href="/feedback"
           className="tap-target flex w-full items-center justify-between rounded-2xl bg-white p-4"
         >
