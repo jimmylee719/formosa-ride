@@ -124,6 +124,21 @@ export default function DaySummaryPage() {
                   });
                   if (res.ok) {
                     localStorage.removeItem('formosa_last_trip');
+                    // 本趟新獲得的成就 → 交給總結頁跳慶祝彈窗（見 AchievementCelebration）
+                    try {
+                      const data = (await res.json()) as {
+                        achievements?: { newlyEarned?: string[] };
+                      };
+                      const newly = data.achievements?.newlyEarned;
+                      if (Array.isArray(newly) && newly.length > 0) {
+                        sessionStorage.setItem(
+                          'formosa_new_achievements',
+                          JSON.stringify(newly)
+                        );
+                      }
+                    } catch {
+                      /* 解析失敗不影響導向 */
+                    }
                     window.location.href = `/journey/summary/${params.tripId}`;
                   } else {
                     window.alert('結束失敗，請稍後再試');

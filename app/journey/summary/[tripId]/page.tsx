@@ -8,6 +8,7 @@ import { Header } from '@/components/ui/Header';
 import { BottomNavBar } from '@/components/mobile/BottomNavBar';
 import { getDeviceId } from '@/lib/device-id';
 import { generateTripShareImage, downloadDataUrl } from '@/lib/trip-share-image';
+import { AchievementCelebration } from '@/components/journey/AchievementCelebration';
 
 interface Totals {
   total_days: number;
@@ -81,6 +82,7 @@ export default function TripSummaryPage() {
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
       <Header />
+      <AchievementCelebration />
       <main className="flex-1 overflow-y-auto bg-neutral-bg p-4">
         {state === 'loading' && (
           <p className="info-secondary mt-8 text-center text-neutral-text">
