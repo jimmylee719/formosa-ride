@@ -1,20 +1,27 @@
 -- ============================================================
--- 0019_spatial_ref_sys_rls.sql — 修正 Supabase 安全建議 rls_disabled_in_public
--- 背景（2026-07-15）：Supabase Advisor 標記 public.spatial_ref_sys「未啟用 RLS」。
---   spatial_ref_sys 是 PostGIS 內建的「座標參考系統定義表」（EPSG/SRID 對照），
---   內容為公開的地理測量標準資料，不含任何使用者/業務資料。它預設不啟用 RLS，
---   是所有使用 PostGIS 的 Supabase 專案都會被標記的已知項目。
---   本系統其餘 30 張表皆已啟用 RLS 並實測擋下匿名讀寫（error 42501），無資料外洩。
+-- 0019_spatial_ref_sys_rls.sql — Supabase 安全建議 rls_disabled_in_public 之處置紀錄
+-- 日期：2026-07-15
 --
--- 修正：對 spatial_ref_sys 啟用 RLS（不建任何政策 = 匿名一律拒絕）。
---   PostGIS 內部運算以表擁有者/超級使用者身分執行，會略過 RLS，故不影響地圖/空間功能。
+-- 【結論：已知且良性，於 Advisors 面板 acknowledge，無需（也無法）以 SQL 修正】
 --
--- ⚠️ 若此行報錯「must be owner of table spatial_ref_sys」（部分 Supabase 專案 anon
---    對此表另有 GRANT），改用下方註解的 REVOKE 版本移除匿名存取即可。
--- 可重複執行
+-- 背景：Supabase Advisor 標記 public.spatial_ref_sys「未啟用 RLS，匿名可讀」。
+--   - spatial_ref_sys 是 PostGIS 內建的「座標參考系統定義表」（EPSG/SRID 對照），
+--     僅含公開的地理測量標準資料，不含任何使用者/業務資料。
+--   - 匿名「唯讀」曝露無實質風險；匿名「無法寫入」（寫入需表擁有者權限）。
+--
+-- 為何無法用 SQL 修正（皆已實測）：
+--   1. ALTER TABLE ... ENABLE ROW LEVEL SECURITY  → ERROR 42501 must be owner
+--      （此表由系統角色 supabase_admin 擁有，非專案 postgres 角色）。
+--   2. REVOKE ... FROM anon, authenticated         → 「成功」但無效：實際授權是
+--      GRANT ... TO PUBLIC，由 supabase_admin 所授。
+--   3. REVOKE ... FROM PUBLIC                       → 「成功」但無效：postgres 只能
+--      收回自己授出的權限，無法收回 supabase_admin 的授權；anon 仍讀得到（已驗證）。
+--
+-- 正式處置：於 Supabase 後台 Advisors 面板將此項 acknowledge / 標記為已知。
+--   （唯一能真正移除者為將 PostGIS 移至獨立 schema，屬高風險大改動，不採用。）
+--
+-- 對照事實（本次事件實測）：本系統其餘 30 張應用表 RLS 皆已啟用，且匿名讀取回 0 筆、
+--   匿名寫入被擋（ERROR 42501 violates row-level security policy）——無任何資料外洩。
+--
+-- 本檔僅為紀錄，無可執行且有效的 DDL。
 -- ============================================================
-
-ALTER TABLE public.spatial_ref_sys ENABLE ROW LEVEL SECURITY;
-
--- 備援方案（若上面因擁有權報錯，改跑這行；移除匿名/登入角色的存取權）：
--- REVOKE ALL ON TABLE public.spatial_ref_sys FROM anon, authenticated;
